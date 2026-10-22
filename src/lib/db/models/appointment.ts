@@ -32,9 +32,15 @@ const appointmentSchema = new Schema(
   {
     reference: { type: String, required: true, match: /^NAV-[0-9A-HJKMNP-TV-Z]{4}-[0-9A-HJKMNP-TV-Z]{4}-[0-9A-HJKMNP-TV-Z]{2}$/ },
     patient: {
-      name: { type: String, required: true, trim: true, minlength: 2, maxlength: 80 },
-      phoneE164: { type: String, required: true, match: /^\+91[6-9]\d{9}$/ },
-      email: { type: String, trim: true, lowercase: true, maxlength: 120 },
+      type: new Schema(
+        {
+          name: { type: String, required: true, trim: true, minlength: 2, maxlength: 80 },
+          phoneE164: { type: String, required: true, match: /^\+91[6-9]\d{9}$/ },
+          email: { type: String, trim: true, lowercase: true, maxlength: 120 },
+        },
+        { _id: false },
+      ),
+      required: true,
     },
     serviceId: { type: Schema.Types.ObjectId, required: true },
     serviceTitle: { type: String, required: true, maxlength: 80 },
@@ -46,9 +52,15 @@ const appointmentSchema = new Schema(
     holdsSlot: { type: Boolean, required: true, default: true },
     message: { type: String, trim: true, maxlength: 500 },
     consent: {
-      privacyAcknowledgedAt: { type: Date, required: true },
-      marketingOptIn: { type: Boolean, default: false },
-      policyVersion: { type: String, required: true, maxlength: 20 },
+      type: new Schema(
+        {
+          privacyAcknowledgedAt: { type: Date, required: true },
+          marketingOptIn: { type: Boolean, default: false },
+          policyVersion: { type: String, required: true, maxlength: 40 },
+        },
+        { _id: false },
+      ),
+      required: true,
     },
     source: { type: String, required: true, enum: ["web", "admin", "phone"] },
     idempotencyKey: { type: String, match: /^[0-9a-f-]{36}$/i },

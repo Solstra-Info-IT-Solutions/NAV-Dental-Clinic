@@ -247,5 +247,5 @@ Indexes: `{ key: 1, windowStart: 1 }` unique; TTL `{ expiresAt: 1 }`. Implementa
 | `clinic_settings.seo.titleTemplate` | Listed | Not stored | The title template is fixed in code for consistency; default title/description remain editable. |
 | `clinic_settings.address` | Inline object | Required sub-schema | Guarantees the address is always present (and typed as non-null). |
 | Index creation | — | `autoIndex` disabled globally; `syncIndexes()` per model in `db:init` | Index builds never happen implicitly on production traffic. |
-| Query safety | — | `sanitizeFilter: true`, `strictQuery: "throw"` set globally | Defence in depth against operator injection. |
+| Query safety | — | `strictQuery: "throw"` globally; user input reaches queries only as Zod-parsed primitives | Phase 4 found that Mongoose's global `sanitizeFilter` also neutralises the app's own trusted `$gte`/`$lt` range queries, so it is not used; injection is prevented at the input boundary instead (tested). |
 

@@ -6,7 +6,22 @@ import mongoose from "mongoose";
 
 import { seedSettings } from "@/features/clinic-settings/repository";
 import { seedServices } from "@/features/services/repository";
-import { ALL_MODELS } from "@/lib/db/models";
+import { ALL_MODELS, ClinicSettingsModel } from "@/lib/db/models";
+
+/**
+ * SAMPLE opening hours for the in-memory development database ONLY. They are
+ * not the clinic's real hours and are never written to a database configured
+ * through MONGODB_URI. Replace with confirmed hours in the admin dashboard.
+ */
+export const DEV_SAMPLE_WEEKLY_HOURS = {
+  mon: [{ open: "10:00", close: "13:30" }, { open: "16:00", close: "20:00" }],
+  tue: [{ open: "10:00", close: "13:30" }, { open: "16:00", close: "20:00" }],
+  wed: [{ open: "10:00", close: "13:30" }, { open: "16:00", close: "20:00" }],
+  thu: [{ open: "10:00", close: "13:30" }, { open: "16:00", close: "20:00" }],
+  fri: [{ open: "10:00", close: "13:30" }, { open: "16:00", close: "20:00" }],
+  sat: [{ open: "10:00", close: "13:30" }, { open: "16:00", close: "20:00" }],
+  sun: [],
+};
 
 export type InitSummary = { collections: string[]; settingsCreated: boolean; servicesInserted: number };
 
@@ -15,13 +30,16 @@ export type InitSummary = { collections: string[]; settingsCreated: boolean; ser
  * transactions need them to exist), synchronises indexes with the schemas, and
  * seeds settings and services without overwriting existing documents.
  */
-export async function initialiseDatabase(): Promise<InitSummary> {
+export async function initialiseDatabase(options: { devSampleHours?: boolean } = {}): Promise<InitSummary> {
   const existing = new Set((await mongoose.connection.db!.listCollections({}, { nameOnly: true }).toArray()).map((c) => c.name));
   for (const model of ALL_MODELS) {
     if (!existing.has(model.collection.collectionName)) await model.createCollection();
     await model.syncIndexes();
   }
   const settings = await seedSettings();
+  if (options.devSampleHours && settings.created) {
+    await ClinicSettingsModel.updateOne({ _id: "default" }, { $set: { weeklyHours: DEV_SAMPLE_WEEKLY_HOURS } });
+  }
   const services = await seedServices();
   return {
     collections: ALL_MODELS.map((m) => m.collection.collectionName),

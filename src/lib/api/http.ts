@@ -1,5 +1,6 @@
 import "server-only";
 
+import { unstable_rethrow } from "next/navigation";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
@@ -20,6 +21,9 @@ export function jsonOk<T>(data: T, init: { status?: number; cache?: string; head
 }
 
 export function jsonError(error: unknown) {
+  // Let Next.js's own control-flow errors (dynamic-rendering bail-outs during
+  // prerender, notFound, redirect) propagate instead of becoming a 500.
+  unstable_rethrow(error);
   const appError = toAppError(error);
   const requestId = crypto.randomUUID();
   if (appError.status >= 500) {

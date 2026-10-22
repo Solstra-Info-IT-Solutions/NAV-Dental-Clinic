@@ -1,6 +1,25 @@
 # API Documentation (Contracts)
 
-**Status:** Contracts finalised in Phase 1. Implementations land in Phases 3–6, and each endpoint is marked here as it ships.
+**Status:** Contracts finalised in Phase 1. See "Implementation status" below for what has shipped.
+
+## Implementation status
+
+| Endpoint | Phase | Status |
+|---|---|---|
+| `GET /api/public/settings`, `GET /api/public/services`, `GET /api/public/services/{slug}` | 3 | Implemented, tested |
+| `GET /api/public/available-dates`, `GET /api/public/slots` | 4 | Implemented, tested |
+| `POST /api/public/appointments`, `POST /api/public/appointments/status` | 4 | Implemented, tested |
+| `GET /api/cron/notifications` | 4 | Implemented, tested (401 without secret; delivery path unit/integration-tested) |
+| `POST /api/public/enquiries` | 5 | Not started |
+| `/api/auth/*`, `/api/admin/*` | 6 | Not started. The status-change and reschedule **services** they will call already exist and are tested. |
+
+Deviations from the Phase 1 contract (Phase 4):
+
+- `GET /api/public/available-dates` returns `{ from, lastAllowed, dates: [{ date, available }] }` (adds `from`/`lastAllowed` so the form knows the window).
+- `409 SLOT_UNAVAILABLE` alternatives are `[{ start, label, date }]` (adds `date` so suggestions can span days).
+- `POST /api/public/appointments` success also returns `emailWillBeSent` (true only if the patient gave an email, patient acknowledgements are enabled and an email provider is configured). It never claims delivery.
+- `publicClosures` is not yet included in `GET /api/public/settings`; closures are applied server-side to dates and slots.
+- Cloudflare Turnstile is **not yet enforced** (`turnstileToken` is accepted and ignored) until the widget and CSP are added in Phase 8.
 **Base path:** `/api`. All bodies are JSON (`Content-Type: application/json`), max **16 KB**. All times are ISO-8601 UTC strings (`2026-11-03T04:30:00.000Z`); `localDate` is `YYYY-MM-DD` in Asia/Kolkata.
 
 ## 0. Common rules

@@ -33,7 +33,8 @@
 | Broken access control | `requireAdmin()` in every protected layout, Server Action and Route Handler; role checks; a test that **enumerates every `/api/admin/*` route** and asserts 401 without a session | Automated |
 | CSRF | `SameSite=Lax` cookies + same-origin check on all mutations + Better Auth's origin check; Server Actions have built-in origin checks | Integration test with a foreign `Origin` |
 | XSS | React escaping; **no `dangerouslySetInnerHTML`** except JSON-LD serialised with `<` escaped; services stored as plain text; nonce-based CSP | Lint rule + CSP test |
-| NoSQL injection | Zod parses to primitives before queries; Mongoose `sanitizeFilter`; `strictQuery`; regex search input escaped and length-capped | Unit tests |
+| NoSQL injection | Zod parses every user value to a primitive before it reaches a query; `strictQuery: "throw"`; regex search input escaped and length-capped. (Mongoose's global `sanitizeFilter` is not used: it also disables the app's own trusted `$gte`/`$lt` queries — found in Phase 4.) | Schema unit tests; integration tests |
+| Spoofed client IP for rate limits | Rate limits key on the first `X-Forwarded-For` value. Vercel documents that it overwrites this header with the real client IP (re-verify against current Vercel docs in Phase 10); a self-hosted deployment must sit behind a proxy that does the same. | Deployment checklist (Phase 10) |
 | CSV injection | Export cells prefixed with `'` when they start with `= + - @` | Unit test |
 | Sensitive data in logs | Structured logger with a redaction list (`phone`, `email`, `password`, `token`, `cookie`, `authorization`); phones masked; IPs salted-hashed | Unit test on the logger |
 | Secret leakage | Only `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_TURNSTILE_SITE_KEY` and `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` are public; `server-only` imports; env validated at boot; `.env*` git-ignored; secret scan (gitleaks) before release | Build-output grep + gitleaks |

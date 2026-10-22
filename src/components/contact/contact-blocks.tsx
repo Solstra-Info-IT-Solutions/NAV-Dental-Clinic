@@ -88,7 +88,13 @@ export function OpeningHours({ settings, tone = "light" }: { settings: PublicCli
             <th scope="row" className="py-2 pr-4 font-medium">
               {row.day}
             </th>
-            <td className="py-2">{row.hours}</td>
+            <td className="py-2">
+              {row.hours.split(", ").map((range) => (
+                <span key={range} className="block whitespace-nowrap">
+                  {range}
+                </span>
+              ))}
+            </td>
           </tr>
         ))}
       </tbody>

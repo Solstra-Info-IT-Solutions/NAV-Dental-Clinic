@@ -18,6 +18,11 @@ const serverEnvSchema = z.object({
     .regex(/^[A-Za-z0-9_-]{1,38}$/)
     .default("nav_dental"),
   RATE_LIMIT_SALT: z.string().min(16).optional(),
+  RESEND_API_KEY: z.string().min(10).optional(),
+  EMAIL_FROM: z.string().min(3).max(200).optional(),
+  CRON_SECRET: z.string().min(16).optional(),
+  /** Set by scripts/with-db.ts only when it starts the in-memory development database. */
+  NAV_DEV_SAMPLE_DATA: z.enum(["1"]).optional(),
 });
 
 export type ServerEnv = z.infer<typeof serverEnvSchema>;
@@ -31,6 +36,10 @@ export function serverEnv(): ServerEnv {
     MONGODB_URI: process.env.MONGODB_URI || undefined,
     MONGODB_DB: process.env.MONGODB_DB || undefined,
     RATE_LIMIT_SALT: process.env.RATE_LIMIT_SALT || undefined,
+    RESEND_API_KEY: process.env.RESEND_API_KEY || undefined,
+    EMAIL_FROM: process.env.EMAIL_FROM || undefined,
+    CRON_SECRET: process.env.CRON_SECRET || undefined,
+    NAV_DEV_SAMPLE_DATA: process.env.NAV_DEV_SAMPLE_DATA || undefined,
   });
   if (!parsed.success) {
     throw new Error(`Invalid server environment: ${z.prettifyError(parsed.error)}`);

@@ -5,10 +5,12 @@ import mongoose from "mongoose";
 import { requireMongoUri, serverEnv } from "@/config/env.server";
 import { logger } from "@/lib/logger";
 
-// Defence in depth against operator injection: query filters containing
-// `$`-prefixed keys from user input are wrapped in $eq, and unknown filter
-// paths throw instead of being silently dropped.
-mongoose.set("sanitizeFilter", true);
+// Operator injection is prevented at the boundary: every user-supplied value is
+// parsed by Zod into a primitive (string/number/boolean) before it reaches a
+// query, so `{ $ne: ... }`-style objects can never be smuggled in. Mongoose's
+// global `sanitizeFilter` is NOT used because it also neutralises the
+// application's own trusted range operators ($gte/$lt). Unknown filter paths
+// throw instead of being silently dropped.
 mongoose.set("strictQuery", "throw");
 // Indexes are created explicitly by `npm run db:init` (and by tests), never
 // implicitly on first model use in production.

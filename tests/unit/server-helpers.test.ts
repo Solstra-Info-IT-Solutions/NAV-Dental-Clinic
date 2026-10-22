@@ -71,6 +71,14 @@ describe("error responses", () => {
     expect(isDuplicateKeyError(error, "resourceKey")).toBe(true);
     expect(isDuplicateKeyError(error, "reference")).toBe(false);
   });
+
+  it("recognises bulk-write duplicate-key errors from insertMany", () => {
+    const bulk = { name: "MongoBulkWriteError", code: 11000, message: "E11000 duplicate key error collection: x.slot_holds index: resourceKey_1_start_1 dup key: {}" };
+    expect(isDuplicateKeyError(bulk, "resourceKey")).toBe(true);
+    expect(isDuplicateKeyError(bulk, "idempotencyKey")).toBe(false);
+    const nested = { writeErrors: [{ code: 11000, err: { code: 11000, keyPattern: { reference: 1 } } }] };
+    expect(isDuplicateKeyError(nested, "reference")).toBe(true);
+  });
 });
 
 describe("logger redaction", () => {

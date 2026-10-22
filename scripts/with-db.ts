@@ -11,6 +11,7 @@
  * Usage: tsx --conditions=react-server scripts/with-db.ts <command> [...args]
  */
 import { spawn } from "node:child_process";
+import { randomBytes } from "node:crypto";
 
 import { loadEnvConfig } from "@next/env";
 import { MongoMemoryReplSet } from "mongodb-memory-server";
@@ -48,11 +49,16 @@ async function prepareMemoryDatabase(): Promise<MongoMemoryReplSet | null> {
     });
   }
   process.env.MONGODB_URI = MEMORY_URI;
+  // Tells the app it is running on throwaway sample data (shows a banner).
+  process.env.NAV_DEV_SAMPLE_DATA = "1";
+  // `next start` runs in production mode, which requires a salt; a per-session
+  // random one is fine because the in-memory data is discarded anyway.
+  process.env.RATE_LIMIT_SALT ??= randomBytes(24).toString("base64url");
   await mongoose.connect(MEMORY_URI, { dbName: process.env.MONGODB_DB || "nav_dental" });
-  const summary = await initialiseDatabase();
+  const summary = await initialiseDatabase({ devSampleHours: true });
   await mongoose.disconnect();
   console.log(
-    `[with-db] Database ready (${summary.collections.length} collections; settings ${summary.settingsCreated ? "seeded" : "kept"}; ${summary.servicesInserted} services seeded).`,
+    `[with-db] Database ready (${summary.collections.length} collections; settings ${summary.settingsCreated ? "seeded with SAMPLE opening hours" : "kept"}; ${summary.servicesInserted} services seeded).`,
   );
   return replSet;
 }

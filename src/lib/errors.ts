@@ -63,12 +63,31 @@ export function isAppError(error: unknown): error is AppError {
   return error instanceof AppError;
 }
 
-/** MongoDB duplicate-key error (E11000), optionally for a specific index key. */
+/**
+ * MongoDB duplicate-key error (E11000), optionally for a specific index key.
+ * Handles single writes (keyPattern on the error) and bulk writes such as
+ * insertMany (details on writeErrors / errorResponse, or only in the message).
+ */
 export function isDuplicateKeyError(error: unknown, keyField?: string): boolean {
-  if (!error || typeof error !== "object" || (error as { code?: unknown }).code !== 11000) return false;
+  if (!error || typeof error !== "object") return false;
+  const e = error as {
+    code?: unknown;
+    keyPattern?: Record<string, unknown>;
+    message?: string;
+    errorResponse?: { code?: unknown; keyPattern?: Record<string, unknown> };
+    writeErrors?: Array<{ code?: unknown; err?: { code?: unknown; keyPattern?: Record<string, unknown>; errmsg?: string }; errmsg?: string }>;
+  };
+  const first = e.writeErrors?.[0];
+  const isDuplicate = e.code === 11000 || e.errorResponse?.code === 11000 || first?.code === 11000 || first?.err?.code === 11000;
+  if (!isDuplicate) return false;
   if (!keyField) return true;
-  const keyPattern = (error as { keyPattern?: Record<string, unknown> }).keyPattern;
-  return Boolean(keyPattern && keyField in keyPattern);
+
+  const keyPattern = e.keyPattern ?? e.errorResponse?.keyPattern ?? first?.err?.keyPattern;
+  if (keyPattern) return keyField in keyPattern;
+  // Fall back to the index name in the server message, e.g. "index: resourceKey_1_start_1".
+  const message = e.message ?? first?.errmsg ?? first?.err?.errmsg ?? "";
+  const indexName = /index: (\S+)/.exec(message)?.[1] ?? "";
+  return indexName.split("_").includes(keyField);
 }
 
 /** Network/server-selection failures from the driver. */
