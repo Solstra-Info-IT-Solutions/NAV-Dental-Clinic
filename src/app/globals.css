@@ -1,0 +1,78 @@
+@import "tailwindcss";
+@import "../styles/tokens.css";
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-padding-top: 5rem;
+  }
+
+  body {
+    background-color: var(--color-paper-50);
+    color: var(--color-ink-900);
+    font-family: var(--font-sans);
+    font-size: 1.0625rem; /* 17px body per design system */
+    line-height: 1.65;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    line-height: 1.2;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-ink-900);
+    outline-offset: 2px;
+  }
+
+  /* Dark brand surfaces flip the focus ring to platinum for contrast. */
+  .surface-dark :focus-visible {
+    outline-color: var(--color-platinum-100);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@utility surface-dark {
+  background-color: var(--color-ink-900);
+  color: var(--color-platinum-100);
+}
+
+/* Thin silver rule echoing the horizontal terminals of the logo. */
+@utility rule-silver {
+  height: 1px;
+  border: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--color-steel-400) 20%,
+    var(--color-silver-200) 50%,
+    var(--color-steel-400) 80%,
+    transparent
+  );
+}
+
+@utility eyebrow {
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}

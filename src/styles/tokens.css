@@ -1,0 +1,47 @@
+/*
+ * NAV Dental Clinic design tokens — the single source of truth for colour,
+ * type, radius and elevation. Values are measured from the supplied logo
+ * (see docs/BRAND_ANALYSIS.md and docs/DESIGN_SYSTEM.md). Components must use
+ * these tokens via Tailwind utilities (bg-ink-900, text-silver-300, …) and
+ * never raw hex values.
+ */
+@theme {
+  /* Remove Tailwind's default palette so only brand tokens can be used. */
+  --color-*: initial;
+
+  /* Brand neutrals (measured) */
+  --color-ink-950: #0a0a0a;
+  --color-ink-900: #131313;
+  --color-ink-800: #1e1e1e;
+  --color-ink-700: #2e2e2e;
+  --color-graphite-600: #4a4a4a;
+  --color-graphite-500: #5c5c5c;
+  --color-steel-400: #818181;
+  --color-silver-300: #aaaaaa;
+  --color-silver-200: #d0d0d0;
+  --color-platinum-100: #f1f1f1;
+  --color-paper-50: #fafafa;
+  --color-white: #ffffff;
+
+  /* Functional status colours — validation and status only, never decoration */
+  --color-danger: #b42318;
+  --color-success: #1e6b3a;
+  --color-warning: #a15c00;
+
+  /* Typography (variables set by next/font in the root layout) */
+  --font-display: var(--font-cinzel), "Times New Roman", serif;
+  --font-sans: var(--font-montserrat), "Segoe UI", system-ui, sans-serif;
+
+  /* Radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+
+  /* Elevation — overlays only */
+  --shadow-overlay: 0 10px 30px rgb(10 10 10 / 0.18);
+
+  /* Layout */
+  --container-site: 75rem;
+
+  /* Motion */
+  --ease-brand: cubic-bezier(0.2, 0.7, 0.2, 1);
+}
