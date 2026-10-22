@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 
 import { BookingActions } from "@/components/appointments/booking-cta";
 import { ClinicAddress, ContactLinks, OpeningHours } from "@/components/contact/contact-blocks";
+import { ContactForm } from "@/components/contact/contact-form";
 import { PageHero } from "@/components/layout/page-hero";
 import { Container, Section } from "@/components/ui/layout-primitives";
+import { formatPhoneDisplay } from "@/features/clinic-settings/format";
 import { getPublicSettings } from "@/features/clinic-settings/queries";
 
 export const metadata: Metadata = {
@@ -19,7 +21,7 @@ export default async function ContactPage() {
     <>
       <PageHero
         title="Contact the clinic"
-        intro="Call the clinic for appointments and questions, or use the directions link to find us."
+        intro="Call the clinic, send a message, or use the directions link to find us."
         crumbs={[{ href: "/contact", label: "Contact" }]}
       />
       <Section tone="white">
@@ -44,16 +46,30 @@ export default async function ContactPage() {
           </section>
         </Container>
       </Section>
-      {/* The enquiry form (Phase 5) is added here. */}
-      <Section aria-labelledby="contact-cta">
-        <Container>
-          <h2 id="contact-cta" className="font-display text-3xl">
-            Book an appointment
-          </h2>
-          <p className="mt-3 max-w-2xl text-graphite-600">The quickest way to arrange a visit is to call the clinic.</p>
-          <div className="mt-8">
-            <BookingActions settings={settings} showRequestLink={false} />
+      <Section aria-labelledby="enquiry-title">
+        <Container className="grid gap-12 lg:grid-cols-[1.3fr_0.7fr]">
+          <div>
+            <h2 id="enquiry-title" className="font-display text-3xl">
+              Send a message
+            </h2>
+            <p className="mt-3 max-w-2xl text-graphite-600">
+              Questions about the clinic or a treatment? Send a message and the team will reply on your mobile number.
+            </p>
+            <div className="mt-8">
+              <ContactForm phoneLabel={formatPhoneDisplay(settings.phoneE164)} />
+            </div>
           </div>
+          <aside aria-labelledby="other-ways" className="h-fit space-y-4 rounded-md border border-silver-200 bg-white p-6">
+            <h2 id="other-ways" className="text-xl font-semibold">
+              Prefer to talk?
+            </h2>
+            <p className="text-graphite-600">
+              To book an appointment, calling is quickest
+              {settings.whatsappE164 ? ", or send us a WhatsApp message" : ""}.
+            </p>
+            <BookingActions settings={settings} showRequestLink={false} />
+            <p className="text-sm text-graphite-600">For a medical emergency, seek urgent medical care immediately.</p>
+          </aside>
         </Container>
       </Section>
     </>

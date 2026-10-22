@@ -10,7 +10,7 @@
 | `GET /api/public/available-dates`, `GET /api/public/slots` | 4 | Implemented, tested |
 | `POST /api/public/appointments`, `POST /api/public/appointments/status` | 4 | Implemented, tested |
 | `GET /api/cron/notifications` | 4 | Implemented, tested (401 without secret; delivery path unit/integration-tested) |
-| `POST /api/public/enquiries` | 5 | Not started |
+| `POST /api/public/enquiries` | 5 | Implemented, tested. Content-flagged messages are stored as `spam` and receive the same `201 { received: true }`. |
 | `/api/auth/*`, `/api/admin/*` | 6 | Not started. The status-change and reschedule **services** they will call already exist and are tested. |
 
 Deviations from the Phase 1 contract (Phase 4):

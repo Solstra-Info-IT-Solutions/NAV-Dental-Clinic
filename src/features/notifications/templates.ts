@@ -81,3 +81,26 @@ export function staffNewAppointmentEmail(a: TemplateAppointment, clinic: Templat
     clinic,
   );
 }
+
+export type TemplateEnquiry = { name: string; phoneE164: string; email?: string; categoryLabel: string; message: string; createdAt: Date };
+
+/** Internal alert for a new contact enquiry. */
+export function staffNewEnquiryEmail(e: TemplateEnquiry, clinic: TemplateClinic, adminUrl: string): RenderedEmail {
+  return render(
+    `New enquiry from ${e.name} – ${e.categoryLabel}`,
+    [
+      "A new enquiry was sent through the website contact form.",
+      [
+        `Name: ${e.name}`,
+        `Mobile: ${formatPhoneDisplay(e.phoneE164)}`,
+        ...(e.email ? [`Email: ${e.email}`] : []),
+        `Topic: ${e.categoryLabel}`,
+        `Received: ${formatLocalDate(e.createdAt)} ${formatLocalTime(e.createdAt)}`,
+      ].join("\n"),
+      `Message:\n${e.message}`,
+      `Open the admin dashboard: ${adminUrl}`,
+    ],
+    clinic,
+  );
+}
+

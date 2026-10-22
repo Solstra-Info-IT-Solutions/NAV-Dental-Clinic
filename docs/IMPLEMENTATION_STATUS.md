@@ -1,6 +1,6 @@
 # Implementation Status
 
-_Last updated: 2026-10-22 (end of Phase 4)_
+_Last updated: 2026-10-22 (end of Phase 5)_
 
 ## Phase status
 
@@ -11,7 +11,7 @@ _Last updated: 2026-10-22 (end of Phase 4)_
 | 2 Setup & public UI | Tested (local production build) |
 | 3 Backend & database | **Tested** (in-memory MongoDB replica set; Atlas pending) |
 | 4 Appointment booking | **Tested** (in-memory DB with sample hours; email delivery not verified) |
-| 5 Contact & enquiries | Not Started |
+| 5 Contact & enquiries | **Tested** (in-memory DB; staff email delivery not verified) |
 | 6 Admin dashboard | Not Started |
 | 7 SEO & content | Not Started |
 | 8 Quality & security | Not Started |
@@ -29,10 +29,11 @@ _Last updated: 2026-10-22 (end of Phase 4)_
 - Online appointment requests: live dates/slots, booking form, transactional slot holds (no double booking), idempotent submissions, booking references, status lookup page
 - Appointment status machine, cancellation slot release and atomic rescheduling (services ready for the admin dashboard)
 - Notification recording with retry/backoff and a protected cron endpoint (email provider not yet configured)
+- Contact form with layered spam protection, rate limits, idempotent submissions, staff alerts and enquiry status management (service layer)
 
 ## Files changed
 
-- Phase 0–1: `e903721` · Phase 2: `9e17002` · Phase 3: `88a6496` · Phase 4: see `docs/PHASE_04_APPOINTMENT_BOOKING.md` §2
+- Phase 0–1: `e903721` · Phase 2: `9e17002` · Phase 3: `88a6496` · Phase 4: `591ead7` · Phase 5: see `docs/PHASE_05_CONTACT_SYSTEM.md` §2
 
 ## Tests executed (latest run)
 
@@ -40,9 +41,9 @@ _Last updated: 2026-10-22 (end of Phase 4)_
 |---|---|
 | `npm run lint` | Pass |
 | `npm run typecheck` | Pass |
-| `npm run test` | 105/105 passed (unit + integration on a real replica set) |
+| `npm run test` | 120/120 passed (unit + integration on a real replica set) |
 | `npm run build` | Pass |
-| `npx playwright test` | 80 passed, 14 skipped by design |
+| `npx playwright test` | 87 passed, 17 skipped by design |
 | `npm audit --omit=dev` | 0 vulnerabilities |
 
 ## Known issues
@@ -59,4 +60,4 @@ See PHASE_00_DISCOVERY.md §3, plus: MongoDB Atlas URI, Resend account + verifie
 
 ## Next recommended step
 
-Phase 5: contact form and enquiries (persistence, spam protection, rate limits, staff alert, statuses). It reuses the Phase 3–4 request, spam, rate-limit and notification foundations.
+Phase 6: secure admin dashboard. That means Better Auth sign-in, admin creation script, server-side guards on every admin route/action, dashboard counts, appointment management (list/filter/detail/confirm/reject/cancel/reschedule/manual booking/notes), enquiry management, schedule (closures, slot blocks) and clinic settings including opening hours, services, audit log and notification retry. Once this is done, the clinic's real hours can be entered without code changes.

@@ -5,11 +5,19 @@ import { Types } from "mongoose";
 import { addressOneLine } from "@/features/clinic-settings/format";
 import { findSettings, toPublicSettings } from "@/features/clinic-settings/repository";
 import { absoluteUrl } from "@/config/site";
-import { AppointmentModel, NotificationAttemptModel, type AppointmentDoc, type ClinicSettingsDoc } from "@/lib/db/models";
+import { ENQUIRY_CATEGORY_LABELS, type EnquiryCategory } from "@/features/enquiries/schemas";
+import { AppointmentModel, EnquiryModel, NotificationAttemptModel, type AppointmentDoc, type ClinicSettingsDoc, type EnquiryDoc } from "@/lib/db/models";
 import { logger, maskEmail } from "@/lib/logger";
 
 import { EmailProviderError, getEmailProvider } from "./email-provider";
-import { patientAppointmentEmail, staffNewAppointmentEmail, type AppointmentEvent, type RenderedEmail, type TemplateAppointment } from "./templates";
+import {
+  patientAppointmentEmail,
+  staffNewAppointmentEmail,
+  staffNewEnquiryEmail,
+  type AppointmentEvent,
+  type RenderedEmail,
+  type TemplateAppointment,
+} from "./templates";
 
 /** Delay before retry n (1-based). After the last entry the attempt is abandoned. */
 export const RETRY_BACKOFF_MINUTES = [5, 30, 120, 720];
@@ -59,9 +67,33 @@ function clinicData(settings: ClinicSettingsDoc) {
  * stale details and recipient addresses are not duplicated into the log.
  */
 async function resolveMessage(kind: Kind, subjectId: Types.ObjectId): Promise<Resolved> {
-  const [appointment, settings] = await Promise.all([AppointmentModel.findById(subjectId).lean<AppointmentWithId>().exec(), findSettings()]);
-  if (!appointment || !settings) return null;
+  const settings = await findSettings();
+  if (!settings) return null;
   const clinic = clinicData(settings);
+
+  if (kind === "staff_new_enquiry") {
+    const enquiry = await EnquiryModel.findById(subjectId).lean<EnquiryDoc & { createdAt: Date }>().exec();
+    const to = settings.notifications?.staffEmails ?? [];
+    if (!enquiry || to.length === 0) return null;
+    return {
+      to,
+      email: staffNewEnquiryEmail(
+        {
+          name: enquiry.name,
+          phoneE164: enquiry.phoneE164,
+          email: enquiry.email ?? undefined,
+          categoryLabel: ENQUIRY_CATEGORY_LABELS[enquiry.category as EnquiryCategory],
+          message: enquiry.message,
+          createdAt: enquiry.createdAt,
+        },
+        clinic,
+        absoluteUrl("/admin/enquiries"),
+      ),
+    };
+  }
+
+  const appointment = await AppointmentModel.findById(subjectId).lean<AppointmentWithId>().exec();
+  if (!appointment) return null;
   if (kind === "staff_new_appointment") {
     const to = settings.notifications?.staffEmails ?? [];
     return to.length ? { to, email: staffNewAppointmentEmail(templateData(appointment), clinic, absoluteUrl("/admin/appointments")) } : null;
@@ -116,11 +148,17 @@ async function deliver(attemptId: Types.ObjectId): Promise<"sent" | "failed" | "
   }
 }
 
-async function enqueue(kind: Kind, subjectId: Types.ObjectId, audience: "patient" | "staff", recipients: string[]) {
+async function enqueue(
+  kind: Kind,
+  subjectId: Types.ObjectId,
+  audience: "patient" | "staff",
+  recipients: string[],
+  subjectType: "appointment" | "enquiry" = "appointment",
+) {
   const attempt = await NotificationAttemptModel.create({
     kind,
     channel: "email",
-    subjectType: "appointment",
+    subjectType,
     subjectId,
     audience,
     recipientMasked: recipients.map(maskEmail).join(", ").slice(0, 200),
@@ -147,6 +185,19 @@ export async function notifyAppointmentEvent(appointmentId: Types.ObjectId | str
     if (event === "received" && prefs?.staffNewBooking !== false && staff.length > 0) await enqueue("staff_new_appointment", id, "staff", staff);
   } catch (error) {
     logger.error("notification.enqueue_failed", { appointmentId: String(appointmentId), event, error });
+  }
+}
+
+/** Staff alert for a new (non-spam) enquiry. Never throws; failures are recorded. */
+export async function notifyEnquiryReceived(enquiryId: Types.ObjectId | string): Promise<void> {
+  try {
+    const id = new Types.ObjectId(String(enquiryId));
+    const settings = await findSettings();
+    const staff = settings?.notifications?.staffEmails ?? [];
+    if (settings?.notifications?.staffNewEnquiry === false || staff.length === 0) return;
+    await enqueue("staff_new_enquiry", id, "staff", staff, "enquiry");
+  } catch (error) {
+    logger.error("notification.enqueue_failed", { enquiryId: String(enquiryId), error });
   }
 }
 
