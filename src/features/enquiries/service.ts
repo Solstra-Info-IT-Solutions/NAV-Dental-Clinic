@@ -5,7 +5,9 @@ import { Types } from "mongoose";
 import { recordAudit, type AuditActor } from "@/features/audit/service";
 import { EnquiryModel, type EnquiryDoc } from "@/lib/db/models";
 import { AppError, isDuplicateKeyError } from "@/lib/errors";
+import { toCsv } from "@/lib/csv";
 import { logger, maskPhone } from "@/lib/logger";
+import { isValidLocalDate, localDayBounds } from "@/lib/time/ist";
 
 import type { EnquiryRequest, EnquiryStatus } from "./schemas";
 
@@ -155,3 +157,26 @@ export async function listEnquiries(query: EnquiryListQuery) {
   ]);
   return { items, page: { page: query.page, pageSize: query.pageSize, total, totalPages: Math.max(1, Math.ceil(total / query.pageSize)) } };
 }
+
+export async function getEnquiry(id: string): Promise<StoredEnquiry> {
+  if (!Types.ObjectId.isValid(id)) throw new AppError("NOT_FOUND");
+  const doc = await EnquiryModel.findById(id).lean<StoredEnquiry>().exec();
+  if (!doc) throw new AppError("NOT_FOUND");
+  return doc;
+}
+
+/** Owner CSV export of non-spam enquiries in a date range (max 92 days). */
+export async function exportEnquiriesCsv(params: { from: string; to: string }): Promise<string> {
+  if (!isValidLocalDate(params.from) || !isValidLocalDate(params.to) || params.from > params.to) {
+    throw new AppError("VALIDATION_FAILED", { fields: { from: "Choose a valid date range." } });
+  }
+  const start = localDayBounds(params.from).start;
+  const end = localDayBounds(params.to).end;
+  if (end.getTime() - start.getTime() > 93 * 86_400_000) throw new AppError("VALIDATION_FAILED", { fields: { to: "Export at most 92 days at a time." } });
+  const docs = await EnquiryModel.find({ createdAt: { $gte: start, $lt: end }, status: { $ne: "spam" } }).sort({ createdAt: 1 }).lean<StoredEnquiry[]>().exec();
+  return toCsv(
+    ["Received", "Name", "Mobile", "Email", "Topic", "Status", "Message"],
+    docs.map((e) => [e.createdAt, e.name, e.phoneE164, e.email ?? "", e.category, e.status, e.message]),
+  );
+}
+

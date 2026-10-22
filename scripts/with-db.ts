@@ -17,6 +17,8 @@ import { loadEnvConfig } from "@next/env";
 import { MongoMemoryReplSet } from "mongodb-memory-server";
 import mongoose from "mongoose";
 
+import { createAdminUser, generateTemporaryPassword } from "@/features/admin-users/service";
+
 import { initialiseDatabase } from "./lib/database";
 
 const MEMORY_PORT = 27027;
@@ -37,6 +39,19 @@ async function isReachable(uri: string): Promise<boolean> {
   }
 }
 
+/**
+ * In-memory development only: makes sure an owner account exists so the admin
+ * dashboard can be used. Credentials come from DEV_ADMIN_EMAIL /
+ * DEV_ADMIN_PASSWORD, otherwise a random password is generated and printed.
+ */
+async function ensureDevOwner(): Promise<void> {
+  const email = (process.env.DEV_ADMIN_EMAIL || "owner@nav-dental.test").toLowerCase();
+  if (await mongoose.connection.db!.collection("user").findOne({ email })) return;
+  const password = process.env.DEV_ADMIN_PASSWORD || generateTemporaryPassword();
+  await createAdminUser({ name: "Development Owner", email, role: "owner", password, actor: "system" });
+  console.log(`[with-db] Development owner account: ${email}${process.env.DEV_ADMIN_PASSWORD ? "" : ` / password: ${password}`} (in-memory database only)`);
+}
+
 async function prepareMemoryDatabase(): Promise<MongoMemoryReplSet | null> {
   let replSet: MongoMemoryReplSet | null = null;
   if (await isReachable(MEMORY_URI)) {
@@ -54,8 +69,10 @@ async function prepareMemoryDatabase(): Promise<MongoMemoryReplSet | null> {
   // `next start` runs in production mode, which requires a salt; a per-session
   // random one is fine because the in-memory data is discarded anyway.
   process.env.RATE_LIMIT_SALT ??= randomBytes(24).toString("base64url");
+  process.env.BETTER_AUTH_SECRET ??= randomBytes(32).toString("base64url");
   await mongoose.connect(MEMORY_URI, { dbName: process.env.MONGODB_DB || "nav_dental" });
   const summary = await initialiseDatabase({ devSampleHours: true });
+  await ensureDevOwner();
   await mongoose.disconnect();
   console.log(
     `[with-db] Database ready (${summary.collections.length} collections; settings ${summary.settingsCreated ? "seeded with SAMPLE opening hours" : "kept"}; ${summary.servicesInserted} services seeded).`,

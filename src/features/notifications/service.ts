@@ -223,3 +223,26 @@ export async function retryNotification(attemptId: string) {
   if (!Types.ObjectId.isValid(attemptId)) return "skipped" as const;
   return deliver(new Types.ObjectId(attemptId));
 }
+
+/** Recent notification attempts for the admin dashboard, optionally only problems. */
+export async function listNotificationAttempts(params: { problemsOnly?: boolean; limit?: number } = {}) {
+  const docs = await NotificationAttemptModel.find(params.problemsOnly ? { status: { $in: ["failed", "abandoned"] } } : {})
+    .sort({ createdAt: -1 })
+    .limit(params.limit ?? 50)
+    .lean()
+    .exec();
+  return docs.map((d) => ({
+    id: String(d._id),
+    kind: d.kind,
+    audience: d.audience,
+    subjectType: d.subjectType,
+    subjectId: String(d.subjectId),
+    recipientMasked: d.recipientMasked ?? "",
+    status: d.status,
+    attempts: d.attempts,
+    nextRetryAt: d.nextRetryAt?.toISOString(),
+    lastError: d.lastError ?? undefined,
+    createdAt: (d as unknown as { createdAt: Date }).createdAt.toISOString(),
+  }));
+}
+

@@ -23,6 +23,7 @@ export const RATE_LIMITS = {
   enquiryCreatePhone: { scope: "enquiries.create:phone", limit: 5, windowSeconds: 86_400 },
   signInIp: { scope: "auth.sign-in:ip", limit: 5, windowSeconds: 900 },
   signInEmail: { scope: "auth.sign-in:email", limit: 10, windowSeconds: 3_600 },
+  admin: { scope: "admin:user", limit: 300, windowSeconds: 60 },
 } as const satisfies Record<string, RateLimitRule>;
 
 export type RateLimitResult = { allowed: boolean; remaining: number; retryAfterSeconds: number };

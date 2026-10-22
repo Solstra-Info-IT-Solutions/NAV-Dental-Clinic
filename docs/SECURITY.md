@@ -58,13 +58,17 @@ X-Frame-Options: DENY
 ```
 `style-src 'unsafe-inline'` is required for Next.js/Tailwind runtime style attributes. This is documented as an accepted risk. `frame-src https://www.google.com` is present only if the clinic approves an embedded Google Map. Otherwise a static "Get directions" link is used, and the map is loaded only after the visitor clicks it (no third-party request on page load).
 
-## 5. Authentication details
+## 5. Authentication details (implemented in Phase 6)
 
 - Better Auth email/password; passwords hashed by Better Auth (scrypt); minimum 12 characters; maximum 128.
 - Public sign-up disabled. The first owner is created with `npm run admin:create`, which prompts interactively. No default or hardcoded passwords exist anywhere.
 - Sessions: database-backed, 8 h with sliding refresh, revoked on password change; "sign out all sessions" available to the owner.
 - Password reset only once transactional email is configured and verified.
-- Optional TOTP two-factor (Better Auth plugin) recommended for the owner. Decision deferred to Phase 6.
+- Optional TOTP two-factor (Better Auth plugin) recommended for the owner. **Not yet enabled; awaiting client decision.**
+- Sessions: 8 h, refreshed hourly, cookie prefix `nav.`, `HttpOnly`, `SameSite=Lax`, `Secure` in production. Disabled accounts cannot create sessions; disable, demote or password reset revokes all sessions.
+- Trusted origins for Better Auth: the canonical site URL plus the request's own origin (a cross-site request never matches its target origin, so CSRF protection holds).
+- Password reset by email is unavailable until email is configured; owners reset staff passwords in the admin (one-time temporary password).
+- Every admin page and API route re-checks the session and role on the server; an automated E2E test enumerates all admin routes (401 anonymous / 403 staff on owner-only).
 
 ## 6. Privacy by design
 

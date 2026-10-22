@@ -229,7 +229,9 @@ Indexes: `{ key: 1, windowStart: 1 }` unique; TTL `{ expiresAt: 1 }`. Implementa
 
 ## 12. Authentication collections (Better Auth)
 
-`user`, `session`, `account`, `verification`, managed by Better Auth's MongoDB adapter. Additional field on `user`: `role: "owner" | "staff"` (default `staff`, not settable from input). Public sign-up is disabled. Accounts are created by `npm run admin:create` or by an owner in the admin UI (Phase 6). The exact Better Auth configuration for disabled sign-up plus server-side user creation is verified against the installed version's docs in Phase 6.
+`user`, `session`, `account`, `verification`, managed by Better Auth 1.7 through its MongoDB adapter (implemented in Phase 6). Additional fields on `user`: `role: "owner" | "staff"` (default `staff`) and `disabled: boolean` (default `false`), neither settable from sign-in input. Credential passwords are stored hashed in `account.password` (`providerId: "credential"`). Public sign-up is disabled; accounts are created by `npm run admin:create` or by an owner in the admin UI through Better Auth's internal adapter.
+
+Indexes created by `db:init` (the adapter does not create them): `user.email` **unique**; `session.token` unique; `session.userId`; `session.expiresAt`; `account.userId`; `account.{providerId, accountId}`; `verification.identifier`. Login rate-limit counters use the shared `rate_limits` collection.
 
 ## 13. Retention and initialisation
 

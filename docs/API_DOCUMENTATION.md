@@ -11,7 +11,8 @@
 | `POST /api/public/appointments`, `POST /api/public/appointments/status` | 4 | Implemented, tested |
 | `GET /api/cron/notifications` | 4 | Implemented, tested (401 without secret; delivery path unit/integration-tested) |
 | `POST /api/public/enquiries` | 5 | Implemented, tested. Content-flagged messages are stored as `spam` and receive the same `201 { received: true }`. |
-| `/api/auth/*`, `/api/admin/*` | 6 | Not started. The status-change and reschedule **services** they will call already exist and are tested. |
+| `/api/auth/*` (Better Auth: sign-in, sign-out, session) | 6 | Implemented, tested; sign-up disabled |
+| `/api/admin/*` (24 route files) | 6 | Implemented, tested; every method checked for 401 (anonymous) and 403 (staff on owner-only) by an automated route-enumeration test |
 
 Deviations from the Phase 1 contract (Phase 4):
 
@@ -19,6 +20,15 @@ Deviations from the Phase 1 contract (Phase 4):
 - `409 SLOT_UNAVAILABLE` alternatives are `[{ start, label, date }]` (adds `date` so suggestions can span days).
 - `POST /api/public/appointments` success also returns `emailWillBeSent` (true only if the patient gave an email, patient acknowledgements are enabled and an email provider is configured). It never claims delivery.
 - `publicClosures` is not yet included in `GET /api/public/settings`; closures are applied server-side to dates and slots.
+Deviations from the Phase 1 contract (Phase 6):
+
+- Services are updated with `PUT /api/admin/services/{id}` (full replacement validated as a whole) instead of `PATCH`.
+- Added `GET /api/admin/slots?date=&service=` and `&exclude={appointmentId}` (free times for staff, minimum notice ignored; `exclude` for rescheduling).
+- `GET /api/admin/notifications` accepts `?status=problems` (failed + abandoned).
+- `POST /api/admin/users` always generates a temporary password (returned once); there is no email invitation yet. `PATCH /api/admin/users/{id}` also accepts `{ resetPassword: true }`.
+- The owner-only `overrideHours` option for manual bookings is **not implemented**.
+- Settings `PATCH` returns the full updated settings (with the new `version`).
+
 - Cloudflare Turnstile is **not yet enforced** (`turnstileToken` is accepted and ignored) until the widget and CSP are added in Phase 8.
 **Base path:** `/api`. All bodies are JSON (`Content-Type: application/json`), max **16 KB**. All times are ISO-8601 UTC strings (`2026-11-03T04:30:00.000Z`); `localDate` is `YYYY-MM-DD` in Asia/Kolkata.
 

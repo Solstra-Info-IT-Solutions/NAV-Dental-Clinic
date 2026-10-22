@@ -7,6 +7,27 @@ import type { AppointmentStatus } from "@/lib/db/models/appointment";
 
 export type { AppointmentStatus };
 
+/** Client-safe copy of the status list (the model module must not be bundled for the browser). */
+export const APPOINTMENT_STATUSES_LIST = [
+  "pending",
+  "confirmed",
+  "reschedule_requested",
+  "completed",
+  "cancelled",
+  "rejected",
+  "no_show",
+] as const satisfies readonly AppointmentStatus[];
+
+export const STATUS_LABELS: Record<AppointmentStatus, string> = {
+  pending: "Pending",
+  confirmed: "Confirmed",
+  reschedule_requested: "Reschedule requested",
+  completed: "Completed",
+  cancelled: "Cancelled",
+  rejected: "Rejected",
+  no_show: "No-show",
+};
+
 type Rule = { requiresStarted?: boolean };
 
 export const TRANSITIONS: Record<AppointmentStatus, Partial<Record<AppointmentStatus, Rule>>> = {

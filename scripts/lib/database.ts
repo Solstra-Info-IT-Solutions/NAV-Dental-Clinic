@@ -23,6 +23,21 @@ export const DEV_SAMPLE_WEEKLY_HOURS = {
   sun: [],
 };
 
+/**
+ * Better Auth's MongoDB adapter does not create indexes; these enforce unique
+ * logins and keep session lookups fast.
+ */
+async function ensureAuthIndexes(): Promise<void> {
+  const db = mongoose.connection.db!;
+  await db.collection("user").createIndex({ email: 1 }, { unique: true });
+  await db.collection("session").createIndex({ token: 1 }, { unique: true });
+  await db.collection("session").createIndex({ userId: 1 });
+  await db.collection("session").createIndex({ expiresAt: 1 });
+  await db.collection("account").createIndex({ userId: 1 });
+  await db.collection("account").createIndex({ providerId: 1, accountId: 1 });
+  await db.collection("verification").createIndex({ identifier: 1 });
+}
+
 export type InitSummary = { collections: string[]; settingsCreated: boolean; servicesInserted: number };
 
 /**
@@ -36,6 +51,7 @@ export async function initialiseDatabase(options: { devSampleHours?: boolean } =
     if (!existing.has(model.collection.collectionName)) await model.createCollection();
     await model.syncIndexes();
   }
+  await ensureAuthIndexes();
   const settings = await seedSettings();
   if (options.devSampleHours && settings.created) {
     await ClinicSettingsModel.updateOne({ _id: "default" }, { $set: { weeklyHours: DEV_SAMPLE_WEEKLY_HOURS } });

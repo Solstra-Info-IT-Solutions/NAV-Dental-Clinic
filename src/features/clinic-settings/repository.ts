@@ -112,3 +112,14 @@ function stripMeta(doc: ClinicSettingsDoc): Record<string, unknown> {
   const picked = Object.fromEntries(editable.map((key) => [key, source[key]]));
   return JSON.parse(JSON.stringify(picked, (_key, value: unknown) => (value === null ? undefined : value))) as Record<string, unknown>;
 }
+
+export type AdminSettings = ClinicSettingsInput & { version: number; updatedAt?: string };
+
+/** Full editable settings plus version, for the owner's settings screen. */
+export async function getAdminSettings(): Promise<AdminSettings> {
+  const doc = await findSettings();
+  if (!doc) throw new AppError("NOT_FOUND", { message: "Clinic settings have not been initialised. Run npm run db:init." });
+  const editable = clinicSettingsInputSchema.parse(stripMeta(doc));
+  return { ...editable, version: doc.version, updatedAt: (doc as { updatedAt?: Date }).updatedAt?.toISOString() };
+}
+

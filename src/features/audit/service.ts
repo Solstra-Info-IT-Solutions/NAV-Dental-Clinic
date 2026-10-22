@@ -35,3 +35,32 @@ export async function recordAudit(
     { session },
   );
 }
+
+/** Paginated, newest-first audit trail for owners. */
+export async function listAudit(query: { page: number; pageSize: number; entity?: string; entityId?: string }) {
+  const filter: Record<string, unknown> = {};
+  if (query.entity) filter.entity = query.entity;
+  if (query.entityId) filter.entityId = query.entityId;
+  const [items, total] = await Promise.all([
+    AuditLogModel.find(filter)
+      .sort({ at: -1 })
+      .skip((query.page - 1) * query.pageSize)
+      .limit(query.pageSize)
+      .lean()
+      .exec(),
+    AuditLogModel.countDocuments(filter),
+  ]);
+  return {
+    items: items.map((a) => ({
+      id: String(a._id),
+      at: a.at.toISOString(),
+      actorEmail: a.actorEmail ?? "system",
+      action: a.action,
+      entity: a.entity,
+      entityId: a.entityId,
+      changes: a.changes.map((c) => ({ field: c.field, from: c.from, to: c.to })),
+    })),
+    page: { page: query.page, pageSize: query.pageSize, total, totalPages: Math.max(1, Math.ceil(total / query.pageSize)) },
+  };
+}
+

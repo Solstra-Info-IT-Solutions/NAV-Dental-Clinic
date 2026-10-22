@@ -21,6 +21,8 @@ const serverEnvSchema = z.object({
   RESEND_API_KEY: z.string().min(10).optional(),
   EMAIL_FROM: z.string().min(3).max(200).optional(),
   CRON_SECRET: z.string().min(16).optional(),
+  BETTER_AUTH_SECRET: z.string().min(32, "BETTER_AUTH_SECRET must be at least 32 characters").optional(),
+  BETTER_AUTH_URL: z.url().optional(),
   /** Set by scripts/with-db.ts only when it starts the in-memory development database. */
   NAV_DEV_SAMPLE_DATA: z.enum(["1"]).optional(),
 });
@@ -39,6 +41,8 @@ export function serverEnv(): ServerEnv {
     RESEND_API_KEY: process.env.RESEND_API_KEY || undefined,
     EMAIL_FROM: process.env.EMAIL_FROM || undefined,
     CRON_SECRET: process.env.CRON_SECRET || undefined,
+    BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET || undefined,
+    BETTER_AUTH_URL: process.env.BETTER_AUTH_URL || undefined,
     NAV_DEV_SAMPLE_DATA: process.env.NAV_DEV_SAMPLE_DATA || undefined,
   });
   if (!parsed.success) {
@@ -64,6 +68,14 @@ export function rateLimitSalt(): string {
   if (RATE_LIMIT_SALT) return RATE_LIMIT_SALT;
   if (NODE_ENV === "production") throw new Error("RATE_LIMIT_SALT must be set in production.");
   return "development-only-rate-limit-salt";
+}
+
+/** Secret for signing admin session cookies. Required in production. */
+export function authSecret(): string {
+  const { BETTER_AUTH_SECRET, NODE_ENV } = serverEnv();
+  if (BETTER_AUTH_SECRET) return BETTER_AUTH_SECRET;
+  if (NODE_ENV === "production") throw new Error("BETTER_AUTH_SECRET must be set in production.");
+  return "development-only-auth-secret-change-me-0123456789";
 }
 
 /** Test hook: forget parsed values after mutating process.env. */
