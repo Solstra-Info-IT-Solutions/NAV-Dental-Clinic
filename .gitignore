@@ -1,0 +1,32 @@
+# dependencies
+node_modules/
+.pnp
+.pnp.*
+
+# next.js / build
+.next/
+out/
+build/
+next-env.d.ts
+*.tsbuildinfo
+
+# testing
+coverage/
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+
+# env — never commit real secrets (.env.example is committed)
+.env
+.env*.local
+.env.*
+!.env.example
+
+# logs / os / editors
+npm-debug.log*
+*.log
+.DS_Store
+Thumbs.db
+.vercel
+.idea/
