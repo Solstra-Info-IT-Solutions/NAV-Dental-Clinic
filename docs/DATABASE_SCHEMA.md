@@ -1,6 +1,6 @@
 # Database Schema
 
-**Status:** Contract finalised in Phase 1 (2026-10-22). Implementation lands in Phase 3; any deviation found while implementing is recorded here first.
+**Status:** Implemented in Phase 3 (2026-10-22) — models in `src/lib/db/models/`, indexes created by `npm run db:init`. Deviations from the Phase 1 contract are listed in §14.
 **Database:** MongoDB Atlas (replica set, which multi-document transactions require). Database name: from `MONGODB_DB` (default `nav_dental`).
 **ODM:** Mongoose 9, `strict: true`, `timestamps: true` on every collection unless noted.
 
@@ -236,3 +236,16 @@ Indexes: `{ key: 1, windowStart: 1 }` unique; TTL `{ expiresAt: 1 }`. Implementa
 - `npm run db:init`: runs `syncIndexes()` for every model and upserts `clinic_settings` defaults and seed services (idempotent; never overwrites edited documents).
 - `npm run db:purge`: deletes appointments whose `end` is older than `retentionMonthsAppointments` (plus their holds and notification attempts), and enquiries older than `retentionMonthsEnquiries`. It never runs automatically until the clinic approves the retention periods.
 - **Backups:** Atlas continuous cloud backup (M10+) or scheduled `mongodump` for lower tiers. Documented in DEPLOYMENT.md.
+
+## 14. Implementation deviations (Phase 3)
+
+| Item | Phase 1 contract | Implemented | Reason |
+|---|---|---|---|
+| `services.sections` | `{ heading, body ≤ 3000 }` | `{ heading, paragraphs: string[] (each ≤ 3000) }` | Paragraph arrays render without storing or parsing any markup. |
+| `services.redirectFrom` | Mentioned only in the API doc | `string[]`, indexed | Supports permanent redirects when a slug changes (Phase 7). |
+| `clinic_settings.legalPagesApproved` | Not listed | `boolean`, default `false` | Controls the draft notice and `noindex` on legal pages. |
+| `clinic_settings.seo.titleTemplate` | Listed | Not stored | The title template is fixed in code for consistency; default title/description remain editable. |
+| `clinic_settings.address` | Inline object | Required sub-schema | Guarantees the address is always present (and typed as non-null). |
+| Index creation | — | `autoIndex` disabled globally; `syncIndexes()` per model in `db:init` | Index builds never happen implicitly on production traffic. |
+| Query safety | — | `sanitizeFilter: true`, `strictQuery: "throw"` set globally | Defence in depth against operator injection. |
+

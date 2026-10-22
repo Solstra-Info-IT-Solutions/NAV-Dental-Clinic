@@ -1,9 +1,10 @@
 /**
- * Service content seed. Copy is general patient information drafted for the
- * clinic's review — it makes no claims about results and gives no individual
- * advice. Only services the clinic has confirmed are `published`
- * (docs/PHASE_00_DISCOVERY.md §3 item 4). From Phase 3 this seeds the
- * `services` collection and the admin manages publication.
+ * Service content SEED, written to the `services` collection by
+ * `npm run db:init`; the database is the source of truth afterwards.
+ * Copy is general patient information drafted for the clinic's review — it
+ * makes no claims about results and gives no individual advice. Only
+ * services the clinic has confirmed are `published` (docs/PHASE_00_DISCOVERY.md
+ * §3 item 4); the admin manages publication.
  */
 
 export type ServiceSection = { heading: string; paragraphs: string[] };
@@ -13,7 +14,7 @@ export type ServiceContent = {
   slug: string;
   title: string;
   summary: string;
-  sections: [ServiceSection, ServiceSection, ServiceSection];
+  sections: ServiceSection[];
   faqs: ServiceFaq[];
   published: boolean;
   bookable: boolean;

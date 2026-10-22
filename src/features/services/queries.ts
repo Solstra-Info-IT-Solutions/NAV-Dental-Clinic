@@ -2,16 +2,23 @@ import "server-only";
 
 import { cacheLife, cacheTag } from "next/cache";
 
-import { SERVICE_CATALOG, type ServiceContent } from "./catalog";
+import { connectToDatabase } from "@/lib/db/connection";
+
+import type { ServiceContent } from "./catalog";
+import { findPublishedServices } from "./repository";
 
 export const SERVICES_TAG = "services";
 
-/** Published services in display order. Phase 3 swaps in a MongoDB read. */
+/**
+ * Published services in display order, cached and tagged so admin edits can
+ * call revalidateTag(SERVICES_TAG).
+ */
 export async function getPublishedServices(): Promise<ServiceContent[]> {
   "use cache";
   cacheTag(SERVICES_TAG);
   cacheLife("hours");
-  return SERVICE_CATALOG.filter((s) => s.published).sort((a, b) => a.order - b.order);
+  await connectToDatabase();
+  return findPublishedServices();
 }
 
 export async function getPublishedService(slug: string): Promise<ServiceContent | null> {
