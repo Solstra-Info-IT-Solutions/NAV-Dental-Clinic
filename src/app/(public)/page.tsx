@@ -89,6 +89,7 @@ export default async function HomePage() {
               width={1080}
               height={1080}
               fetchPriority="high"
+              loading="eager"
               sizes="(min-width: 1024px) 28rem, (min-width: 640px) 24rem, 16rem"
               className="h-auto w-full rounded-md"
             />

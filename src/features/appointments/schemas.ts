@@ -5,6 +5,10 @@
  */
 import { z } from "zod";
 
+// Zod 4 probes `new Function` for faster parsing; the Content-Security-Policy
+// forbids eval in the browser, so use the eval-free path everywhere.
+z.config({ jitless: true });
+
 /** Version of the privacy notice shown next to the booking form. Stored with each consent. */
 export const PRIVACY_POLICY_VERSION = "2026-10-22-draft";
 

@@ -23,6 +23,7 @@ Without `MONGODB_URI`, `npm run dev`, `npm run build` and `npm run start` automa
 | `npm run test` | Unit and integration tests (Vitest) |
 | `npm run db:init` | Create collections/indexes and seed settings + services (idempotent; needs `MONGODB_URI`) |
 | `npm run admin:create -- --email … --name "…" [--role owner/staff]` | Create an admin account (password typed hidden, or generated and shown once) |
+| `npm run db:purge [-- --apply]` | Show (or delete) records older than the clinic's retention periods |
 | `npm run test:e2e` | End-to-end tests (Playwright) against a production build (run `npm run build` first) |
 
 ## Documentation

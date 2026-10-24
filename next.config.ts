@@ -1,21 +1,14 @@
 import type { NextConfig } from "next";
 
+import { securityHeaders } from "./src/lib/security/headers";
 import { indexingFromEnv } from "./src/lib/seo/indexing";
 
 // Decided per build: production deployments on the real domain only.
 const INDEXABLE = indexingFromEnv();
 
-// Baseline security headers. The nonce-based Content-Security-Policy is added
-// in Phase 8 (see docs/SECURITY.md §4) because it needs per-request nonces.
-const securityHeaders = [
-  { key: "X-Content-Type-Options", value: "nosniff" },
-  { key: "X-Frame-Options", value: "DENY" },
-  { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
-  {
-    key: "Permissions-Policy",
-    value: "camera=(), microphone=(), geolocation=(), payment=()",
-  },
-];
+// Security headers (CSP trade-offs documented in src/lib/security/headers.ts and docs/SECURITY.md).
+const HTTPS = (process.env.NEXT_PUBLIC_SITE_URL ?? "").startsWith("https://");
+const SECURITY_HEADERS = securityHeaders({ https: HTTPS, development: process.env.NODE_ENV === "development" });
 
 const nextConfig: NextConfig = {
   cacheComponents: true,
@@ -33,7 +26,7 @@ const nextConfig: NextConfig = {
   },
   async headers() {
     return [
-      { source: "/:path*", headers: securityHeaders },
+      { source: "/:path*", headers: SECURITY_HEADERS },
       {
         // Private areas must never be indexed, whatever robots.txt says.
         source: "/(admin|api)/:path*",

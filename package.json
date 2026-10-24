@@ -12,7 +12,8 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "db:init": "tsx --conditions=react-server scripts/db-init.ts",
-    "admin:create": "tsx --conditions=react-server scripts/admin-create.ts"
+    "admin:create": "tsx --conditions=react-server scripts/admin-create.ts",
+    "db:purge": "tsx --conditions=react-server scripts/db-purge.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.9.2",
