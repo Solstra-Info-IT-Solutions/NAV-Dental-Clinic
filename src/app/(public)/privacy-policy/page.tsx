@@ -4,15 +4,17 @@ import Link from "next/link";
 import { LegalPage } from "@/components/legal/legal-page";
 import { addressOneLine, formatPhoneDisplay } from "@/features/clinic-settings/format";
 import { getPublicSettings } from "@/features/clinic-settings/queries";
+import { pageMetadata } from "@/lib/seo/metadata";
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getPublicSettings();
-  return {
+  // Drafts are kept out of search results until the clinic approves them.
+  return pageMetadata({
     title: "Privacy Policy",
     description: "How NAV Dental Clinic collects, uses and protects information submitted through this website.",
-    // Drafts are kept out of search results until the clinic approves them.
-    robots: settings.legalPagesApproved ? undefined : { index: false, follow: true },
-  };
+    path: "/privacy-policy",
+    noindex: !settings.legalPagesApproved,
+  });
 }
 
 export default async function PrivacyPolicyPage() {

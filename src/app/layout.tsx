@@ -31,6 +31,11 @@ export const metadata: Metadata = {
     "NAV Dental Clinic on Somna Road, Pahasu. Request a dental appointment with Dr. Ratan Raghav or call +91 80066 06001.",
   applicationName: "NAV Dental Clinic",
   formatDetection: { telephone: false },
+  openGraph: { siteName: "NAV Dental Clinic", locale: "en_IN", type: "website" },
+  twitter: { card: "summary_large_image" },
+  ...(process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION
+    ? { verification: { google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION } }
+    : {}),
 };
 
 export const viewport: Viewport = {

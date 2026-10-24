@@ -5,7 +5,7 @@ import { cacheLife, cacheTag } from "next/cache";
 import { connectToDatabase } from "@/lib/db/connection";
 
 import type { ServiceContent } from "./catalog";
-import { findPublishedServices } from "./repository";
+import { findPublishedServices, findServiceRedirects } from "./repository";
 
 export const SERVICES_TAG = "services";
 
@@ -25,3 +25,18 @@ export async function getPublishedService(slug: string): Promise<ServiceContent 
   const services = await getPublishedServices();
   return services.find((s) => s.slug === slug) ?? null;
 }
+
+/** Current slug for a renamed service's old slug, if any (cached with the services tag). */
+export async function getServiceRedirect(oldSlug: string): Promise<string | null> {
+  const map = await getServiceRedirectMap();
+  return map[oldSlug] ?? null;
+}
+
+async function getServiceRedirectMap(): Promise<Record<string, string>> {
+  "use cache";
+  cacheTag(SERVICES_TAG);
+  cacheLife("hours");
+  await connectToDatabase();
+  return findServiceRedirects();
+}
+

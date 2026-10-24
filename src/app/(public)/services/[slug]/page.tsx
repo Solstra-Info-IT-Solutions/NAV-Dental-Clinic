@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 
 import { BookingActions } from "@/components/appointments/booking-cta";
 import { FaqList } from "@/components/faq/faq-list";
@@ -8,7 +8,11 @@ import { PageHero } from "@/components/layout/page-hero";
 import { Container, Section } from "@/components/ui/layout-primitives";
 import { Prose } from "@/components/ui/prose";
 import { getPublicSettings } from "@/features/clinic-settings/queries";
-import { getPublishedService, getPublishedServices } from "@/features/services/queries";
+import { getPublishedService, getPublishedServices, getServiceRedirect } from "@/features/services/queries";
+import { JsonLd } from "@/components/seo/json-ld";
+import { siteConfig } from "@/config/site";
+import { pageMetadata } from "@/lib/seo/metadata";
+import { serviceJsonLd } from "@/lib/seo/structured-data";
 
 // Render unlisted slugs completely before responding, so notFound() for an
 // unknown or unpublished service returns a real HTTP 404 instead of a
@@ -24,18 +28,28 @@ export async function generateMetadata({ params }: PageProps<"/services/[slug]">
   const { slug } = await params;
   const service = await getPublishedService(slug);
   if (!service) return {};
-  return { title: `${service.title} in Pahasu`, description: service.summary };
+  return pageMetadata({
+    title: service.seo?.title || `${service.title} in Pahasu`,
+    description: service.seo?.description || service.summary,
+    path: `/services/${service.slug}`,
+  });
 }
 
 export default async function ServicePage({ params }: PageProps<"/services/[slug]">) {
   const { slug } = await params;
   const [service, settings, services] = await Promise.all([getPublishedService(slug), getPublicSettings(), getPublishedServices()]);
-  if (!service) notFound();
+  if (!service) {
+    // A renamed service keeps working at its old address (308 permanent redirect).
+    const current = await getServiceRedirect(slug);
+    if (current) permanentRedirect(`/services/${current}`);
+    notFound();
+  }
 
   const related = services.filter((s) => s.slug !== service.slug).slice(0, 3);
 
   return (
     <>
+      <JsonLd data={serviceJsonLd(service, siteConfig.url)} />
       <PageHero
         title={service.title}
         intro={service.summary}

@@ -5,13 +5,15 @@ import { PageHero } from "@/components/layout/page-hero";
 import { Container, Section } from "@/components/ui/layout-primitives";
 import { formatPhoneDisplay } from "@/features/clinic-settings/format";
 import { getPublicSettings } from "@/features/clinic-settings/queries";
+import { pageMetadata } from "@/lib/seo/metadata";
 
-export const metadata: Metadata = {
+// Personal lookups have no search value.
+export const metadata: Metadata = pageMetadata({
   title: "Check Appointment Request Status",
   description: "Check the status of an appointment request at NAV Dental Clinic using your booking reference and mobile number.",
-  // Personal lookups have no search value.
-  robots: { index: false, follow: true },
-};
+  path: "/appointment/status",
+  noindex: true,
+});
 
 export default async function AppointmentStatusPage() {
   const settings = await getPublicSettings();

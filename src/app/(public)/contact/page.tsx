@@ -7,18 +7,24 @@ import { PageHero } from "@/components/layout/page-hero";
 import { Container, Section } from "@/components/ui/layout-primitives";
 import { formatPhoneDisplay } from "@/features/clinic-settings/format";
 import { getPublicSettings } from "@/features/clinic-settings/queries";
+import { JsonLd } from "@/components/seo/json-ld";
+import { siteConfig } from "@/config/site";
+import { clinicJsonLd } from "@/lib/seo/structured-data";
+import { pageMetadata } from "@/lib/seo/metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Contact and Directions",
   description:
     "Contact NAV Dental Clinic on Somna Road, near Tata Kishan Kendra, Pahasu, Uttar Pradesh. Phone +91 80066 06001 or get directions.",
-};
+  path: "/contact",
+});
 
 export default async function ContactPage() {
   const settings = await getPublicSettings();
 
   return (
     <>
+      <JsonLd data={clinicJsonLd(settings, siteConfig.url)} />
       <PageHero
         title="Contact the clinic"
         intro="Call the clinic, send a message, or use the directions link to find us."

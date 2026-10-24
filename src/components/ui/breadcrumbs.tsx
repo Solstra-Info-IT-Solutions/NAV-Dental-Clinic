@@ -1,16 +1,20 @@
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 
+import { JsonLd } from "@/components/seo/json-ld";
+import { siteConfig } from "@/config/site";
 import { getDictionary } from "@/i18n";
+import { breadcrumbJsonLd } from "@/lib/seo/structured-data";
 
 export type Crumb = { href: string; label: string };
 
-/** Visual breadcrumb trail. BreadcrumbList JSON-LD is added from the same data in Phase 7. */
+/** Visual breadcrumb trail plus matching BreadcrumbList structured data. */
 export function Breadcrumbs({ items }: { items: Crumb[] }) {
   const t = getDictionary();
   const trail: Crumb[] = [{ href: "/", label: t.nav.home }, ...items];
   return (
     <nav aria-label={t.common.breadcrumb} className="text-sm">
+      <JsonLd data={breadcrumbJsonLd(trail.map((c) => ({ label: c.label, path: c.href })), siteConfig.url)} />
       <ol className="flex flex-wrap items-center gap-1 text-silver-300">
         {trail.map((crumb, index) => {
           const last = index === trail.length - 1;

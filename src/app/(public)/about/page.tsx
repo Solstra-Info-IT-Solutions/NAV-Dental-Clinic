@@ -5,11 +5,14 @@ import { PageHero } from "@/components/layout/page-hero";
 import { CheckMark, Container, Section, SectionHeading } from "@/components/ui/layout-primitives";
 import { Prose } from "@/components/ui/prose";
 import { getPublicSettings } from "@/features/clinic-settings/queries";
+import { pageMetadata } from "@/lib/seo/metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "About Dr. Ratan Raghav and the Clinic",
-  description: "Meet Dr. Ratan Raghav and learn about NAV Dental Clinic on Somna Road, Pahasu, and how appointments work.",
-};
+  description:
+    "Meet Dr. Ratan Raghav and learn about NAV Dental Clinic on Somna Road, Pahasu, and how appointments work.",
+  path: "/about",
+});
 
 // Approach statements describe how visits are run. Wording is pending clinic approval (docs/PHASE_02_PUBLIC_UI.md).
 const approach = [

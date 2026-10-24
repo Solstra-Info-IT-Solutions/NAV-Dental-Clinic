@@ -4,14 +4,17 @@ import Link from "next/link";
 import { LegalPage } from "@/components/legal/legal-page";
 import { formatPhoneDisplay } from "@/features/clinic-settings/format";
 import { getPublicSettings } from "@/features/clinic-settings/queries";
+import { pageMetadata } from "@/lib/seo/metadata";
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getPublicSettings();
-  return {
+  // Drafts are kept out of search results until the clinic approves them.
+  return pageMetadata({
     title: "Terms of Use",
     description: "Terms for using the NAV Dental Clinic website and requesting appointments online.",
-    robots: settings.legalPagesApproved ? undefined : { index: false, follow: true },
-  };
+    path: "/terms",
+    noindex: !settings.legalPagesApproved,
+  });
 }
 
 export default async function TermsPage() {

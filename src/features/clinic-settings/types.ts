@@ -36,4 +36,6 @@ export type PublicClinicSettings = {
   bookingEnabled: boolean;
   bookingMode: "request" | "instant";
   legalPagesApproved: boolean;
+  /** Owner-edited home page search title/description (Clinic settings → Search engines). */
+  seo?: { defaultTitle?: string; defaultDescription?: string };
 };

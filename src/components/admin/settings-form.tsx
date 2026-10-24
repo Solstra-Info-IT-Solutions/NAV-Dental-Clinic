@@ -90,6 +90,7 @@ export function SettingsForm({ initial }: { initial: AdminSettings }) {
         retentionMonthsEnquiries: Number(f.get("retentionMonthsEnquiries")),
       },
       legalPagesApproved: f.get("legalPagesApproved") === "on",
+      seo: { defaultTitle: blank(f.get("seoTitle")), defaultDescription: blank(f.get("seoDescription")) },
     };
     const result = await send<AdminSettings>("/api/admin/settings", "PATCH", { version, changes });
     if (result.ok) {
@@ -226,6 +227,11 @@ export function SettingsForm({ initial }: { initial: AdminSettings }) {
           <CheckboxField id="s-patientAck" name="patientAck" label="Email patients a copy of their request" defaultChecked={initial.notifications.patientAck} />
           <CheckboxField id="s-patientStatus" name="patientStatusEmails" label="Email patients when their appointment is confirmed, moved or cancelled" defaultChecked={initial.notifications.patientStatusEmails} />
         </div>
+      </Section>
+
+      <Section title="Search engines" description="How the home page appears in Google results. Leave empty to use the standard wording. Do not add claims you cannot verify.">
+        <InputField id="s-seoTitle" name="seoTitle" label="Home page title" optional maxLength={60} hint="Up to 60 characters." defaultValue={initial.seo?.defaultTitle} />
+        <TextareaField id="s-seoDescription" name="seoDescription" label="Home page description" optional maxLength={160} hint="Up to 160 characters." defaultValue={initial.seo?.defaultDescription} />
       </Section>
 
       <Section title="Policies and legal pages">

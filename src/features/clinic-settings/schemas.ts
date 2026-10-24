@@ -76,6 +76,12 @@ export const clinicSettingsInputSchema = z
       })
       .prefault({}),
     legalPagesApproved: z.boolean().default(false),
+    seo: z
+      .object({
+        defaultTitle: z.string().trim().max(60, "Keep the search title to 60 characters.").optional(),
+        defaultDescription: z.string().trim().max(160, "Keep the search description to 160 characters.").optional(),
+      })
+      .prefault({}),
   });
 // When WhatsApp is enabled without its own number, the booking phone is used (see toPublicSettings).
 

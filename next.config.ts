@@ -1,5 +1,10 @@
 import type { NextConfig } from "next";
 
+import { indexingFromEnv } from "./src/lib/seo/indexing";
+
+// Decided per build: production deployments on the real domain only.
+const INDEXABLE = indexingFromEnv();
+
 // Baseline security headers. The nonce-based Content-Security-Policy is added
 // in Phase 8 (see docs/SECURITY.md §4) because it needs per-request nonces.
 const securityHeaders = [
@@ -34,6 +39,8 @@ const nextConfig: NextConfig = {
         source: "/(admin|api)/:path*",
         headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
       },
+      // Local, preview and staging builds: keep every page out of search results.
+      ...(INDEXABLE ? [] : [{ source: "/:path*", headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }] }]),
     ];
   },
 };

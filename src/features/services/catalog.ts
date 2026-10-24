@@ -19,6 +19,7 @@ export type ServiceContent = {
   published: boolean;
   bookable: boolean;
   order: number;
+  seo?: { title?: string; description?: string };
 };
 
 export const SERVICE_CATALOG: ServiceContent[] = [

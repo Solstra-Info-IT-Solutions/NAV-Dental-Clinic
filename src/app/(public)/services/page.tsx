@@ -7,11 +7,14 @@ import { EmptyState } from "@/components/ui/feedback";
 import { Container, Section } from "@/components/ui/layout-primitives";
 import { getPublicSettings } from "@/features/clinic-settings/queries";
 import { getPublishedServices } from "@/features/services/queries";
+import { pageMetadata } from "@/lib/seo/metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Dental Services",
-  description: "Dental services at NAV Dental Clinic, Pahasu. Book a consultation with Dr. Ratan Raghav to discuss your treatment options.",
-};
+  description:
+    "Dental services at NAV Dental Clinic, Pahasu. Book a consultation with Dr. Ratan Raghav to discuss your treatment options.",
+  path: "/services",
+});
 
 export default async function ServicesPage() {
   const [settings, services] = await Promise.all([getPublicSettings(), getPublishedServices()]);

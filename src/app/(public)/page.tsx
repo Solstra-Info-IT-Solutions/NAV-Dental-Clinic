@@ -12,12 +12,22 @@ import { isOnlineBookingOpen } from "@/features/clinic-settings/format";
 import { getPublicSettings } from "@/features/clinic-settings/queries";
 import { buildGeneralFaqs } from "@/features/faq/content";
 import { getPublishedServices } from "@/features/services/queries";
+import { JsonLd } from "@/components/seo/json-ld";
+import { siteConfig } from "@/config/site";
+import { pageMetadata } from "@/lib/seo/metadata";
+import { clinicJsonLd, websiteJsonLd } from "@/lib/seo/structured-data";
 
-export const metadata: Metadata = {
-  title: { absolute: "NAV Dental Clinic, Pahasu | Dr. Ratan Raghav" },
-  description:
-    "Dental clinic on Somna Road, near Tata Kishan Kendra, Pahasu. Call +91 80066 06001 or request an appointment with Dr. Ratan Raghav online.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getPublicSettings();
+  return pageMetadata({
+    title: settings.seo?.defaultTitle || "NAV Dental Clinic, Pahasu | Dr. Ratan Raghav",
+    description:
+      settings.seo?.defaultDescription ||
+      "Dental clinic on Somna Road, near Tata Kishan Kendra, Pahasu. Call +91 80066 06001 or request an appointment with Dr. Ratan Raghav online.",
+    path: "/",
+    absoluteTitle: true,
+  });
+}
 
 const bookingSteps = [
   {
@@ -52,6 +62,7 @@ export default async function HomePage() {
 
   return (
     <>
+      <JsonLd data={[clinicJsonLd(settings, siteConfig.url), websiteJsonLd(settings, siteConfig.url)]} />
       {/* Hero */}
       <section aria-labelledby="hero-title" className="surface-dark overflow-hidden">
         <Container className="grid items-center gap-10 py-14 md:py-20 lg:grid-cols-[1.1fr_0.9fr] lg:py-24">

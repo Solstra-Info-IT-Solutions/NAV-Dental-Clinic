@@ -55,6 +55,7 @@ export function toPublicSettings(doc: ClinicSettingsDoc): PublicClinicSettings {
     bookingEnabled: doc.bookingEnabled,
     bookingMode: doc.bookingMode,
     legalPagesApproved: doc.legalPagesApproved,
+    seo: { defaultTitle: opt(doc.seo?.defaultTitle), defaultDescription: opt(doc.seo?.defaultDescription) },
   };
 }
 

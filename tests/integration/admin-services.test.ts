@@ -17,6 +17,7 @@ import { changeAppointmentStatus } from "@/features/appointments/service";
 import { getAdminSettings } from "@/features/clinic-settings/repository";
 import { createClosure, createSlotBlock, deleteSlotBlock, getScheduleDay } from "@/features/schedule/service";
 import { deleteService, getService, listAllServices, updateService } from "@/features/services/admin";
+import { findServiceRedirects } from "@/features/services/repository";
 import { AppointmentModel, ClinicSettingsModel, ServiceModel, SlotHoldModel } from "@/lib/db/models";
 import { addDays, fromLocal, toLocalDate, weekdayOf } from "@/lib/time/ist";
 
@@ -156,6 +157,11 @@ describe("services and settings administration", () => {
     const updated = await updateService(consultation.id, { ...consultation, slug: "dental-check-up", title: "Dental Check-up" }, actor);
     expect(updated.redirectFrom).toEqual(["dental-consultation"]);
     expect((await getService(consultation.id)).title).toBe("Dental Check-up");
+    expect(await findServiceRedirects()).toEqual({ "dental-consultation": "dental-check-up" });
+
+    // Renaming back removes the self-redirect.
+    const restored = await updateService(consultation.id, { ...updated, slug: "dental-consultation" }, actor);
+    expect(restored.redirectFrom).toEqual(["dental-check-up"]);
   });
 
   it("refuses to delete a service that has appointments", async () => {

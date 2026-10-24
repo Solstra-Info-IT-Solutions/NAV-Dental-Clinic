@@ -10,11 +10,14 @@ import { Container, Section } from "@/components/ui/layout-primitives";
 import { formatPhoneDisplay, isOnlineBookingOpen, telHref } from "@/features/clinic-settings/format";
 import { getPublicSettings } from "@/features/clinic-settings/queries";
 import { getPublishedServices } from "@/features/services/queries";
+import { pageMetadata } from "@/lib/seo/metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Book a Dental Appointment",
-  description: "Request a dental appointment at NAV Dental Clinic, Pahasu, online or call +91 80066 06001 to arrange a visit with Dr. Ratan Raghav.",
-};
+  description:
+    "Request a dental appointment at NAV Dental Clinic, Pahasu, online or call +91 80066 06001 to arrange a visit with Dr. Ratan Raghav.",
+  path: "/appointment",
+});
 
 export default async function AppointmentPage() {
   const [settings, services] = await Promise.all([getPublicSettings(), getPublishedServices()]);
