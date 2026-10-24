@@ -1,6 +1,6 @@
 import { defineConfig, devices } from "@playwright/test";
 
-import { E2E_OWNER } from "./tests/e2e/credentials";
+import { E2E_CRON_SECRET, E2E_OWNER } from "./tests/e2e/credentials";
 
 const PORT = Number(process.env.E2E_PORT ?? 3100);
 const baseURL = process.env.E2E_BASE_URL ?? `http://localhost:${PORT}`;
@@ -28,6 +28,6 @@ export default defineConfig({
         reuseExistingServer: !process.env.CI,
         timeout: 120_000,
         // Test-only owner for the throwaway in-memory database (see scripts/with-db.ts).
-        env: { DEV_ADMIN_EMAIL: E2E_OWNER.email, DEV_ADMIN_PASSWORD: E2E_OWNER.password },
+        env: { DEV_ADMIN_EMAIL: E2E_OWNER.email, DEV_ADMIN_PASSWORD: E2E_OWNER.password, CRON_SECRET: E2E_CRON_SECRET },
       },
 });

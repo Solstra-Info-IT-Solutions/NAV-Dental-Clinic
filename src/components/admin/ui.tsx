@@ -19,7 +19,8 @@ export function AdminPageHeader({ title, description, actions }: { title: string
 
 export function Panel({ title, children, className, actions }: { title?: string; children: ReactNode; className?: string; actions?: ReactNode }) {
   return (
-    <section className={cn("rounded-md border border-silver-200 bg-white p-5", className)} aria-label={title}>
+    // min-w-0: inside grid layouts a wide table must scroll within the panel, not widen the page.
+    <section className={cn("min-w-0 rounded-md border border-silver-200 bg-white p-5", className)} aria-label={title}>
       {title || actions ? (
         <div className="mb-4 flex items-center justify-between gap-3">
           {title ? <h2 className="text-lg font-semibold">{title}</h2> : <span />}

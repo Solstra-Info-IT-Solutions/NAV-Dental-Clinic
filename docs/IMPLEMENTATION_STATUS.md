@@ -1,6 +1,6 @@
 # Implementation Status
 
-_Last updated: 2026-10-24 (end of Phase 8)_
+_Last updated: 2026-10-24 (end of Phase 9)_
 
 ## Phase status
 
@@ -15,7 +15,7 @@ _Last updated: 2026-10-24 (end of Phase 8)_
 | 6 Admin dashboard | **Tested** (in-memory DB; not deployed; no 2FA / email password reset yet) |
 | 7 SEO & content | **Tested** (local build; live validation after deployment) |
 | 8 Quality & security | **Tested** (local; HTTPS/HSTS verified at deployment) |
-| 9 Testing | Not Started |
+| 9 Testing | **Tested** (full clean local run; CI not yet run on GitHub) |
 | 10 Deployment & handover | Not Started |
 
 ## Implemented features
@@ -30,13 +30,14 @@ _Last updated: 2026-10-24 (end of Phase 8)_
 - Appointment status machine, cancellation slot release and atomic rescheduling (services ready for the admin dashboard)
 - Notification recording with retry/backoff and a protected cron endpoint (email provider not yet configured)
 - Contact form with layered spam protection, rate limits, idempotent submissions, staff alerts and enquiry status management
+- Test suite: `npm run verify` runs everything; acceptance criteria mapped in TEST_PLAN.md; CI workflow committed
 - Security hardening: CSP (documented inline-script trade-off), COOP, HSTS on HTTPS, eval-free validation, data-retention purge (`db:purge`), bundle secret scan
 - SEO: per-page metadata with canonical/OG/Twitter, owner-editable home SEO, share image, robots.txt and sitemap.xml, noindex outside production, canonical-host redirect, JSON-LD (Dentist, WebSite, BreadcrumbList, Service, FAQPage) from verified data, renamed-service redirects
 - Secure admin dashboard (Better Auth, owner/staff roles enforced server-side): dashboard, appointments (search/filter/detail/confirm/reject/cancel/reschedule/complete/no-show/notes/manual booking/export), schedule (blocks, closures), enquiries, notification retry, services, clinic settings incl. opening hours, staff accounts, audit log
 
 ## Files changed
 
-- Phase 0–1: `e903721` · Phase 2: `9e17002` · Phase 3: `88a6496` · Phase 4: `591ead7` · Phase 5: `a2eb3f3` · Phase 6: `6e44695` · Phase 7: `f9c9622` · Phase 8: see `docs/PHASE_08_QUALITY_SECURITY.md` §2
+- Phase 0–1: `e903721` · Phase 2: `9e17002` · Phase 3: `88a6496` · Phase 4: `591ead7` · Phase 5: `a2eb3f3` · Phase 6: `6e44695` · Phase 7: `f9c9622` · Phase 8: `3129a91` · Phase 9: see `docs/PHASE_09_TESTING.md` §2
 
 ## Tests executed (latest run)
 
@@ -44,9 +45,9 @@ _Last updated: 2026-10-24 (end of Phase 8)_
 |---|---|
 | `npm run lint` | Pass |
 | `npm run typecheck` | Pass |
-| `npm run test` | 150/150 passed (unit + integration on a real replica set) |
+| `npm run test` | 157/157 passed (unit + integration on a real replica set) |
 | `npm run build` | Pass |
-| `npx playwright test` | 116 passed, 40 skipped by design (incl. admin route-enumeration auth test, axe scans, SEO, security headers, bundle secret scan, keyboard) |
+| `npx playwright test` | 121 passed, 0 failed, 45 skipped by design (incl. admin route-enumeration auth test, axe scans, SEO, security headers, bundle secret scan, keyboard, admin workflows, admin on phones) |
 | `npm audit` (all dependencies) | 0 vulnerabilities |
 | Lighthouse 13.5 mobile (5 pages) | Accessibility 100, Best practices 100, Performance 69–87 (see PHASE_08 §5) |
 
@@ -64,4 +65,4 @@ See PHASE_00_DISCOVERY.md §3, plus: MongoDB Atlas URI, Resend account + verifie
 
 ## Next recommended step
 
-Phase 9: consolidated testing. That means a TEST_PLAN.md mapping every acceptance criterion (master prompt §19) to its automated test, filling any gaps (e.g. email notification templates for all events, admin settings validation in the UI, responsive checks at more widths), a full clean run, and PHASE_09_TESTING.md.
+Phase 10: deployment and handover. That means DEPLOYMENT.md (Vercel + Atlas + Resend + domain/DNS + Cron + env vars), CLIENT_HANDOVER.md, PRODUCTION_READINESS_CHECKLIST.md and PHASE_10_DEPLOYMENT_HANDOVER.md. The actual deployment needs the client's accounts (Vercel, Atlas, Resend), the domain and real secrets. Nothing will be marked *Verified in Production* until it has been deployed and smoke-tested.
