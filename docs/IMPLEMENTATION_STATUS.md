@@ -1,6 +1,6 @@
 # Implementation Status
 
-_Last updated: 2026-10-24 (end of Phase 9)_
+_Last updated: 2026-10-24 (end of Phase 10 preparation)_
 
 ## Phase status
 
@@ -16,7 +16,7 @@ _Last updated: 2026-10-24 (end of Phase 9)_
 | 7 SEO & content | **Tested** (local build; live validation after deployment) |
 | 8 Quality & security | **Tested** (local; HTTPS/HSTS verified at deployment) |
 | 9 Testing | **Tested** (full clean local run; CI not yet run on GitHub) |
-| 10 Deployment & handover | Not Started |
+| 10 Deployment & handover | **Blocked**: documentation and configuration done; awaiting client accounts, domain and inputs. Not deployed. |
 
 ## Implemented features
 
@@ -37,7 +37,7 @@ _Last updated: 2026-10-24 (end of Phase 9)_
 
 ## Files changed
 
-- Phase 0–1: `e903721` · Phase 2: `9e17002` · Phase 3: `88a6496` · Phase 4: `591ead7` · Phase 5: `a2eb3f3` · Phase 6: `6e44695` · Phase 7: `f9c9622` · Phase 8: `3129a91` · Phase 9: see `docs/PHASE_09_TESTING.md` §2
+- Phase 0–1: `e903721` · Phase 2: `9e17002` · Phase 3: `88a6496` · Phase 4: `591ead7` · Phase 5: `a2eb3f3` · Phase 6: `6e44695` · Phase 7: `f9c9622` · Phase 8: `3129a91` · Phase 9: `99c540b` · Phase 10: see `docs/PHASE_10_DEPLOYMENT_HANDOVER.md` §2
 
 ## Tests executed (latest run)
 
@@ -65,4 +65,12 @@ See PHASE_00_DISCOVERY.md §3, plus: MongoDB Atlas URI, Resend account + verifie
 
 ## Next recommended step
 
-Phase 10: deployment and handover. That means DEPLOYMENT.md (Vercel + Atlas + Resend + domain/DNS + Cron + env vars), CLIENT_HANDOVER.md, PRODUCTION_READINESS_CHECKLIST.md and PHASE_10_DEPLOYMENT_HANDOVER.md. The actual deployment needs the client's accounts (Vercel, Atlas, Resend), the domain and real secrets. Nothing will be marked *Verified in Production* until it has been deployed and smoke-tested.
+Collect the client inputs (CLIENT_HANDOVER.md §3), create the clinic-owned accounts, then deploy by following DEPLOYMENT.md and complete PRODUCTION_READINESS_CHECKLIST.md. No item is *Verified in Production* yet.
+
+## Final summary
+
+- **Implemented and tested locally:** the public website, online appointment requests with database-enforced conflict protection, status lookup, contact enquiries, notifications with retry, a secure admin dashboard (roles, audit, settings, schedule, services, staff), SEO (metadata, sitemap, robots, structured data), security hardening, accessibility, a retention tool, and full automated test coverage (157 unit/integration tests, 121 end-to-end checks).
+- **Blocked:** deployment, email delivery, live HTTPS/SEO validation, backups. All need the clinic's accounts and domain.
+- **Client details still needed:** opening hours; booking rules; services; doctor credentials; WhatsApp; emails; domain; vector logo; photos; map pin and PIN code; "BSR"; legal approval; cancellation policy; retention periods; staff list; 2FA decision.
+- **External accounts:** GitHub, Vercel (paid plan for commercial use), MongoDB Atlas, Resend, domain registrar/DNS, Google Search Console, Google Business Profile.
+- **Before launch:** everything in PRODUCTION_READINESS_CHECKLIST.md marked ⏳ or 🚀.

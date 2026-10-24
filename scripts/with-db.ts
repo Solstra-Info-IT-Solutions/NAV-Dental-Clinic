@@ -86,8 +86,10 @@ async function main() {
 
   let replSet: MongoMemoryReplSet | null = null;
   if (!process.env.MONGODB_URI) {
-    if (process.env.VERCEL_ENV === "production" || process.env.NODE_ENV === "production") {
-      throw new Error("MONGODB_URI must be set in production; the in-memory database is for development only.");
+    // Hosted builds (any Vercel environment, including previews) must use a real database:
+    // a throwaway in-memory database with sample hours must never be deployed.
+    if (process.env.VERCEL || process.env.VERCEL_ENV || process.env.NODE_ENV === "production") {
+      throw new Error("MONGODB_URI must be set for hosted builds; the in-memory database is for local development and CI only.");
     }
     replSet = await prepareMemoryDatabase();
   }
