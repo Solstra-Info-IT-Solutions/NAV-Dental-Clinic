@@ -1,6 +1,6 @@
 # Test Plan — NAV Dental Clinic
 
-How the project is tested, and where each acceptance criterion from the brief (§19) is proven. All automated tests run on **throwaway data**: the in-memory MongoDB replica set that `scripts/with-db.ts` starts, seeded with **sample** opening hours. They never touch a real database.
+How the project is tested, and where each acceptance criterion from the brief (§19) is proven. All automated tests run on **throwaway data**: the in-memory MongoDB replica set that `scripts/with-db.ts` starts, seeded with **sample** opening hours. They never touch a real database. The `--memory` flag (`build:test`, `start:test`) forces this even when `.env.local` points at Atlas.
 
 ## 1. Test layers
 
@@ -15,12 +15,13 @@ How the project is tested, and where each acceptance criterion from the brief (�
 ## 2. How to run
 
 ```bash
-npm run verify        # lint → typecheck → unit+integration → build → E2E (same as CI)
+npm run verify        # lint → typecheck → unit+integration → build:test → E2E (same as CI)
 npm run lint
 npm run typecheck     # next typegen && tsc --noEmit  (plain `npx tsc --noEmit` also works after `npm install`)
 npm run test          # unit + integration
 npm run build
-npm run test:e2e      # needs a build; starts `npm run start` on port 3100 with test-only credentials
+npm run build:test    # production build on the in-memory database
+npm run test:e2e      # starts `npm run start:test` on port 3100 (in-memory database, test-only credentials)
 ```
 On this development machine, Playwright browsers live on D: (`PLAYWRIGHT_BROWSERS_PATH=D:/ms-playwright`) because C: is full. CI installs them normally (`.github/workflows/ci.yml`).
 

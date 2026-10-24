@@ -40,6 +40,10 @@ Initialise the production database **once**, from your machine:
 MONGODB_URI="mongodb+srv://..." MONGODB_DB="nav_dental" npm run db:init
 MONGODB_URI="mongodb+srv://..." MONGODB_DB="nav_dental" npm run admin:create -- --email <owner-email> --name "Dr. Ratan Raghav" --role owner
 ```
+Then check it with `npm run db:check` (read-only: collections, key indexes, seed data, transaction support, admin accounts).
+
+If the database user's password contains special characters (`@ : / ? # [ ] %`), they must be URL-encoded in `MONGODB_URI` (e.g. `@` → `%40`), otherwise the driver reports *Invalid connection string*.
+
 `db:init` creates collections and indexes and seeds settings (with **empty** opening hours, so online booking stays closed until real hours are entered) and services (only *Dental Consultation* published). It is safe to re-run. `admin:create` asks for the password with hidden input.
 
 ## 3. Resend (email)

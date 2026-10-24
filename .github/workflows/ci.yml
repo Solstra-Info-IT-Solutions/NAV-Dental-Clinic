@@ -41,8 +41,8 @@ jobs:
       - name: Unit and integration tests
         run: npm run test
 
-      - name: Production build
-        run: npm run build
+      - name: Production build (test data)
+        run: npm run build:test
 
       - name: Install Playwright browser
         run: npx playwright install --with-deps chromium

@@ -1,6 +1,6 @@
 # Implementation Status
 
-_Last updated: 2026-10-24 (end of Phase 10 preparation)_
+_Last updated: 2026-10-24 (Atlas database initialised; not deployed)_
 
 ## Phase status
 
@@ -16,7 +16,7 @@ _Last updated: 2026-10-24 (end of Phase 10 preparation)_
 | 7 SEO & content | **Tested** (local build; live validation after deployment) |
 | 8 Quality & security | **Tested** (local; HTTPS/HSTS verified at deployment) |
 | 9 Testing | **Tested** (full clean local run; CI not yet run on GitHub) |
-| 10 Deployment & handover | **Blocked**: documentation and configuration done; awaiting client accounts, domain and inputs. Not deployed. |
+| 10 Deployment & handover | **In Progress**: code on GitHub (`Solstra-Info-IT-Solutions/NAV-Dental-Clinic`); MongoDB Atlas database `nav_dental` initialised and health-checked; owner account, Vercel, email and domain pending. Not deployed. |
 
 ## Implemented features
 
@@ -62,6 +62,13 @@ _Last updated: 2026-10-24 (end of Phase 10 preparation)_
 ## Outstanding client inputs
 
 See PHASE_00_DISCOVERY.md §3, plus: MongoDB Atlas URI, Resend account + verified domain, staff alert email(s), `CRON_SECRET`, `BETTER_AUTH_SECRET`, the list of staff who need accounts (and who is owner), and a 2FA decision. Highest impact: **real opening hours** (online booking stays closed on a real database without them; development and tests use sample hours only).
+
+## Atlas database (2026-10-24)
+
+- Database `nav_dental` on the clinic's Atlas cluster.
+- `npm run db:init`: 10 collections with indexes synchronised; Better Auth indexes created; settings seeded with **empty** opening hours (online booking closed until hours are entered); 13 services, only *Dental Consultation* published.
+- `npm run db:check`: all collections and key indexes present; transactions supported; **0 admin accounts** (owner still to be created with `npm run admin:create`).
+- The connection string lives only in the local, git-ignored `.env.local`.
 
 ## Next recommended step
 

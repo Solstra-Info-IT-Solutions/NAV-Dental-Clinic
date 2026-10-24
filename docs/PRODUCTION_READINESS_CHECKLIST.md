@@ -13,7 +13,7 @@ _Last updated: 2026-10-24. Nothing is marked "verified in production" because th
 | Lint passes | ✅ | `npm run lint` |
 | Unit + integration tests | ✅ | 157/157 |
 | End-to-end tests (desktop + phone) | ✅ | 121 passed, 0 failed |
-| CI on GitHub | 🚀 | `.github/workflows/ci.yml`; runs on the first push |
+| CI on GitHub | 🚀 | Code pushed to `Solstra-Info-IT-Solutions/NAV-Dental-Clinic`; CI runs on every push |
 | Dependency audit | ✅ | `npm audit`: 0 vulnerabilities (2026-10-24) |
 | No secrets in repository or browser bundle | ✅ | git grep scan; E2E bundle scan |
 
@@ -53,14 +53,15 @@ _Last updated: 2026-10-24. Nothing is marked "verified in production" because th
 
 | Item | Status |
 |---|---|
-| No public sign-up; owner created with `admin:create` | ✅ / 🚀 run against production |
+| No public sign-up; owner created with `admin:create` | ✅ / ⏳ Atlas database ready; owner account not created yet |
 | Every admin endpoint returns 401/403 correctly | ✅ |
 | Staff accounts created for each person | ⏳ list needed |
 | Two-factor login for owner | ⏳ client decision |
 | Production secrets generated and stored only in Vercel | 🚀 |
 | HTTPS, HSTS, CSP and security headers on the live domain | 🚀 (headers verified locally) |
 | Canonical host redirect (`*.vercel.app` → domain) | 🚀 |
-| Atlas user least-privilege, network access configured | 🚀 |
+| Atlas database initialised (`db:init`) and health-checked (`db:check`) | ✅ 2026-10-24 |
+| Atlas user least-privilege, network access for Vercel | 🚀 (current user/IP set up by the client; review before launch) |
 | Backups enabled and one restore tested | 🚀 |
 | Monitoring: Vercel notifications, Atlas alerts, uptime check | 🚀 |
 

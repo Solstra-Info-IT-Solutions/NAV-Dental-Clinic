@@ -15,7 +15,11 @@
     "admin:create": "tsx --conditions=react-server scripts/admin-create.ts",
     "db:purge": "tsx --conditions=react-server scripts/db-purge.ts",
     "postinstall": "next typegen",
-    "verify": "npm run lint && npm run typecheck && npm run test && npm run build && npm run test:e2e"
+    "verify": "npm run lint && npm run typecheck && npm run test && npm run build:test && npm run test:e2e",
+    "db:check": "tsx --conditions=react-server scripts/db-check.ts",
+    "dev:memory": "tsx --conditions=react-server scripts/with-db.ts --memory next dev",
+    "build:test": "tsx --conditions=react-server scripts/with-db.ts --memory next build",
+    "start:test": "tsx --conditions=react-server scripts/with-db.ts --memory next start"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.9.2",

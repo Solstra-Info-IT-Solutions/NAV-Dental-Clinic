@@ -23,8 +23,11 @@ Without `MONGODB_URI`, `npm run dev`, `npm run build` and `npm run start` automa
 | `npm run test` | Unit and integration tests (Vitest) |
 | `npm run db:init` | Create collections/indexes and seed settings + services (idempotent; needs `MONGODB_URI`) |
 | `npm run admin:create -- --email … --name "…" [--role owner/staff]` | Create an admin account (password typed hidden, or generated and shown once) |
+| `npm run db:check` | Read-only health check of the configured database (collections, indexes, seed data, transactions, admin accounts) |
+| `npm run dev:memory` | Development server on the throwaway in-memory database, even if `.env.local` points at Atlas |
+| `npm run build:test` | Production build on the in-memory database (used by E2E tests and CI) |
 | `npm run db:purge [-- --apply]` | Show (or delete) records older than the clinic's retention periods |
-| `npm run test:e2e` | End-to-end tests (Playwright) against a production build (run `npm run build` first) |
+| `npm run test:e2e` | End-to-end tests (Playwright) against a test build (run `npm run build:test` first); never touches a real database |
 
 ## Documentation
 

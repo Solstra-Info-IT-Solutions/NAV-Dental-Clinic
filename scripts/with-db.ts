@@ -8,7 +8,8 @@
  *   running), initialised and seeded, and MONGODB_URI is set for the command.
  *   Data lives only as long as the process that started it.
  *
- * Usage: tsx --conditions=react-server scripts/with-db.ts <command> [...args]
+ * Usage: tsx --conditions=react-server scripts/with-db.ts [--memory] <command> [...args]
+ *   --memory  ignore MONGODB_URI and always use the in-memory database (tests)
  */
 import { spawn } from "node:child_process";
 import { randomBytes } from "node:crypto";
@@ -81,8 +82,16 @@ async function prepareMemoryDatabase(): Promise<MongoMemoryReplSet | null> {
 }
 
 async function main() {
-  const [command, ...args] = process.argv.slice(2);
-  if (!command) throw new Error("Usage: with-db <command> [...args]");
+  let argv = process.argv.slice(2);
+  // `--memory` always uses the throwaway in-memory database, even when .env.local
+  // points at a real one (used by the E2E test build/start so tests never touch real data).
+  const forceMemory = argv[0] === "--memory";
+  if (forceMemory) {
+    argv = argv.slice(1);
+    delete process.env.MONGODB_URI;
+  }
+  const [command, ...args] = argv;
+  if (!command) throw new Error("Usage: with-db [--memory] <command> [...args]");
 
   let replSet: MongoMemoryReplSet | null = null;
   if (!process.env.MONGODB_URI) {

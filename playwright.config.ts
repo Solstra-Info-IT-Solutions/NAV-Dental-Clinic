@@ -6,7 +6,8 @@ const PORT = Number(process.env.E2E_PORT ?? 3100);
 const baseURL = process.env.E2E_BASE_URL ?? `http://localhost:${PORT}`;
 
 /**
- * End-to-end tests run against a production build (`npm run build` first).
+ * End-to-end tests run against a production build made with `npm run build:test`
+ * (in-memory database, sample hours), never against a real database.
  * Set E2E_BASE_URL to test an already-running deployment instead.
  */
 export default defineConfig({
@@ -23,7 +24,8 @@ export default defineConfig({
   webServer: process.env.E2E_BASE_URL
     ? undefined
     : {
-        command: `npm run start -- --port ${PORT}`,
+        // Always the throwaway in-memory database, even if .env.local points at Atlas.
+        command: `npm run start:test -- --port ${PORT}`,
         url: baseURL,
         reuseExistingServer: !process.env.CI,
         timeout: 120_000,
