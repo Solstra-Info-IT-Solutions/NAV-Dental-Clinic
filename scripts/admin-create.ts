@@ -12,6 +12,7 @@ import { loadEnvConfig } from "@next/env";
 
 import { createAdminUser, createAdminUserSchema } from "@/features/admin-users/service";
 import { disconnectFromDatabase } from "@/lib/db/connection";
+import { AppError } from "@/lib/errors";
 
 loadEnvConfig(process.cwd());
 
@@ -52,7 +53,8 @@ async function main() {
 
 main()
   .catch((error: unknown) => {
-    console.error("Could not create the admin account:", error instanceof Error ? error.message : error);
+    const fields = error instanceof AppError && error.fields ? Object.entries(error.fields).map(([field, message]) => `\n  ${field}: ${message}`).join("") : "";
+    console.error("Could not create the admin account:", error instanceof Error ? error.message : error, fields);
     process.exitCode = 1;
   })
   .finally(() => disconnectFromDatabase());
